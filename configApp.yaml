@@ -6,14 +6,14 @@ service:
 
 api:
   endpoints:
-    route: "api/customer"
-    method: get
-    actionId: get_customer
+    - route: "api/customer"
+      method: get
+      actionId: get_customer
 
 actions:
-  id: get_customer
-  type: httpRequestMock
-  mock:
-    value: "Hi"
-    contentType: "application/json"
-    method: get
+  - id: get_customer
+    type: httpRequestMock
+    mock:
+      value: "Hi"
+      contentType: "application/json"
+      method: get
