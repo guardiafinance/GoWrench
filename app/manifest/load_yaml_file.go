@@ -7,38 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type Endpoints struct {
-	Route    string `yaml:"route"`
-	Method   string `yaml:"method"`
-	ActionID string `yaml:"actionId"`
-}
-
-type API struct {
-	Endpoints []Endpoints `yaml:"endpoints"`
-}
-
-type Action struct {
-	Id string `yaml:"id"`
-	Type string `yaml:"type"`
-	Mock struct {
-		Value string `yaml:"value"`
-		ContentType string `yaml:"contentType"`
-		Method string `yaml:"method"`
-	} `yaml:"mock"`
-}
-
-type Service struct {
-	Name string `yaml:"name"`
-	Version string `yaml:"version"`
-}
-
-type Config struct {
-	Api           API           `yaml:"api"`
-	Actions       []Action      `yaml:"actions"`
-	Service Service `yaml:"service"`
-}
-
-func LoadYamlFile() (*Config, error) {
+func LoadYamlFile() (*ApplicationSetting, error) {
 	file, err := os.Open("configApp.yaml")
 	if err != nil {
 		return nil, err
@@ -50,7 +19,7 @@ func LoadYamlFile() (*Config, error) {
 		return nil, err
 	}
 
-	var yamlMap Config
+	var yamlMap ApplicationSetting
 	err = yaml.Unmarshal(data, &yamlMap)
 	if err != nil {
 		return nil, err
