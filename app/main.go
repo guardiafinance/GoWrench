@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"net/http"
+	handlershttp "wrench/app/handlers/http"
 	"wrench/app/manifest"
 )
 func main()  {
@@ -11,6 +13,10 @@ func main()  {
 		log.Fatalf("Error loading YAML: %v", err)
 	}
 
-	log.Printf("Service: %v", configApp.Service.Name)
-	log.Printf("Version: %v", configApp.Service.Version)
+
+	r := handlershttp.CreateAPIRoutes(configApp)	
+
+	log.Println("Server running on :8080")
+	log.Fatal(http.ListenAndServe(":8080", r))
+
 }

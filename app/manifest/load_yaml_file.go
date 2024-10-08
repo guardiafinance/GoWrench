@@ -17,9 +17,17 @@ type API struct {
 	Endpoints []Endpoints `yaml:"endpoints"`
 }
 
+type HttpClient struct {
+	Id string `yaml:"id"`
+	BaseUrl string `yaml:"baseUrl"`
+}
+
+
 type Action struct {
 	Id string `yaml:"id"`
 	Type string `yaml:"type"`
+	Path string `yaml:"path"`
+	HttpClientId string `yaml:"httpClientId"`
 	Mock struct {
 		Value string `yaml:"value"`
 		ContentType string `yaml:"contentType"`
@@ -35,7 +43,8 @@ type Service struct {
 type Config struct {
 	Api           API           `yaml:"api"`
 	Actions       []Action      `yaml:"actions"`
-	Service Service `yaml:"service"`
+	Service 			Service 			`yaml:"service"`
+	HttpClients   []HttpClient    `yaml:"httpClients"`
 }
 
 func LoadYamlFile() (*Config, error) {

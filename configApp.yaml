@@ -4,16 +4,36 @@ service:
   name: test-app
   version: 1.0.0
 
+httpClients:
+  - id: github
+    baseUrl: "https://api.github.com"
+
 api:
   endpoints:
-    - route: "api/customer"
+    - route: "/api/users"
+      method: get
+      actionId: get_github_user
+    - route: "/api/customer"
       method: get
       actionId: get_customer
+    - route: "/api/customers"
+      method: get
+      actionId: get_customers
 
 actions:
   - id: get_customer
     type: httpRequestMock
     mock:
-      value: "Hi"
+      value: "Hello world"
       contentType: "application/json"
       method: get
+  - id: get_customers
+    type: httpRequestMock
+    mock:
+      value: '{"foo":"bar", "list": [{"foo":"bar"}, {"foo":"bar"}]}'
+      contentType: "application/json"
+      method: get
+  - id: get_github_user
+    type: httpRequest
+    httpClientId: github
+    path: "/users/vinniimiranda"
