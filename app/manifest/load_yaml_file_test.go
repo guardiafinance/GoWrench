@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-
 func TestLoadYamlFile_Success(t *testing.T) {
 	yamlContent := `
 version: 1
@@ -28,16 +27,16 @@ actions:
 `
 	tmpFile, err := os.CreateTemp("", "configApp*.yaml")
 	if err != nil {
-			t.Fatalf("Could not create temp file: %v", err)
+		t.Fatalf("Could not create temp file: %v", err)
 	}
 	defer os.Remove(tmpFile.Name())
 
 	if _, err := tmpFile.Write([]byte(yamlContent)); err != nil {
-			t.Fatalf("Failed to write to temp file: %v", err)
+		t.Fatalf("Failed to write to temp file: %v", err)
 	}
 
 	if err := tmpFile.Close(); err != nil {
-			t.Fatalf("Failed to close temp file: %v", err)
+		t.Fatalf("Failed to close temp file: %v", err)
 	}
 
 	originalFilePath := "configApp.yaml"
@@ -46,19 +45,19 @@ actions:
 
 	config, err := LoadYamlFile()
 	if err != nil {
-			t.Fatalf("LoadYamlFile failed: %v", err)
+		t.Fatalf("LoadYamlFile failed: %v", err)
 	}
 
 	if config.Service.Name != "test-app" {
-			t.Errorf("Expected service name 'test-app', got '%s'", config.Service.Name)
+		t.Errorf("Expected service name 'test-app', got '%s'", config.Service.Name)
 	}
 
 	if config.Api.Endpoints[0].Route != "api/customer" {
-			t.Errorf("Expected API route 'api/customer', got '%s'", config.Api.Endpoints[0].Route)
+		t.Errorf("Expected API route 'api/customer', got '%s'", config.Api.Endpoints[0].Route)
 	}
 
 	if config.Actions[0].Mock.Value != "Hi" {
-			t.Errorf("Expected mock value 'Hi', got '%s'", config.Actions[0].Mock.Value)
+		t.Errorf("Expected mock value 'Hi', got '%s'", config.Actions[0].Mock.Value)
 	}
 }
 
@@ -69,7 +68,7 @@ func TestLoadYamlFile_FileNotFound(t *testing.T) {
 
 	_, err := LoadYamlFile()
 	if err == nil {
-			t.Fatalf("Expected error when file is not found, but got nil")
+		t.Fatalf("Expected error when file is not found, but got nil")
 	}
 }
 
@@ -94,24 +93,24 @@ actions:
 `
 	tmpFile, err := os.CreateTemp("", "configApp*.yaml")
 	if err != nil {
-			t.Fatalf("Could not create temp file: %v", err)
+		t.Fatalf("Could not create temp file: %v", err)
 	}
 	defer os.Remove(tmpFile.Name())
 
 	if _, err := tmpFile.Write([]byte(yamlContent)); err != nil {
-			t.Fatalf("Failed to write to temp file: %v", err)
+		t.Fatalf("Failed to write to temp file: %v", err)
 	}
 
 	if err := tmpFile.Close(); err != nil {
-			t.Fatalf("Failed to close temp file: %v", err)
+		t.Fatalf("Failed to close temp file: %v", err)
 	}
 
 	originalFilePath := "configApp.yaml"
 	os.Rename(tmpFile.Name(), originalFilePath)
-	defer os.Rename(originalFilePath, tmpFile.Name())		
+	defer os.Rename(originalFilePath, tmpFile.Name())
 
 	_, err = LoadYamlFile()
 	if err == nil {
-			t.Fatalf("Expected error when file is not found, but got nil")
+		t.Fatalf("Expected error when file is not found, but got nil")
 	}
 }
