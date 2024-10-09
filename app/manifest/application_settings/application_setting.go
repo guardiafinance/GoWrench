@@ -1,4 +1,4 @@
-package manifest
+package application_settings
 
 import (
 	"wrench/app/manifest/action_settings"
