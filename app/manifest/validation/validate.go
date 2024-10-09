@@ -15,3 +15,9 @@ func (v ValidateResult) HasError() bool {
 func (v ValidateResult) IsSuccess() bool {
 	return !v.HasError()
 }
+
+func (v ValidateResult) Append(validate ValidateResult) {
+	for _, err := range validate.errors {
+		v.AddError(err)
+	}
+}
