@@ -8,7 +8,11 @@ type ValidateResult struct {
 	errors []string
 }
 
-func (v ValidateResult) AddError(err string) {
+func (v ValidateResult) GetError() []string {
+	return v.errors
+}
+
+func (v *ValidateResult) AddError(err string) {
 	v.errors = append(v.errors, err)
 }
 
@@ -20,13 +24,13 @@ func (v ValidateResult) IsSuccess() bool {
 	return !v.HasError()
 }
 
-func (v ValidateResult) Append(validate ValidateResult) {
+func (v *ValidateResult) Append(validate ValidateResult) {
 	for _, err := range validate.errors {
 		v.AddError(err)
 	}
 }
 
-func (v ValidateResult) AppendValidable(validable validable) {
+func (v *ValidateResult) AppendValidable(validable validable) {
 	var result = validable.Valid()
 	v.Append(result)
 }

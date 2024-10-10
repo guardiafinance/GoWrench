@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"wrench/app/manifest"
 )
@@ -13,6 +14,6 @@ func main() {
 	}
 
 	var result = applicationSetting.Valid()
-	log.Printf("Service: %v", result.HasError())
-
+	var errors = result.GetError()
+	fmt.Println(errors)
 }

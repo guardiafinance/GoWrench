@@ -17,7 +17,7 @@ const (
 	ActionTypeHttpRequest ActionType = "httpRequest"
 )
 
-func (setting *ActionSetting) Valid() *validation.ValidateResult {
+func (setting ActionSetting) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if setting.Mock != nil {
@@ -39,5 +39,5 @@ func (setting *ActionSetting) Valid() *validation.ValidateResult {
 		}
 	}
 
-	return &result
+	return result
 }

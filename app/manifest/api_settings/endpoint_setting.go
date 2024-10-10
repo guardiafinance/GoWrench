@@ -22,7 +22,7 @@ const (
 	HttpMethodDelete HttpMethod = "delete"
 )
 
-func (setting *EndpointSetting) Valid() validation.ValidateResult {
+func (setting EndpointSetting) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if len(setting.Route) == 0 {
