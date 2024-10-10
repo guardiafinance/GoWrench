@@ -1,5 +1,9 @@
 package validation
 
+type validable interface {
+	Valid() ValidateResult
+}
+
 type ValidateResult struct {
 	errors []string
 }
@@ -20,4 +24,9 @@ func (v ValidateResult) Append(validate ValidateResult) {
 	for _, err := range validate.errors {
 		v.AddError(err)
 	}
+}
+
+func (v ValidateResult) AppendValidable(validable validable) {
+	var result = validable.Valid()
+	v.Append(result)
 }

@@ -4,13 +4,15 @@ import (
 	"log"
 	"wrench/app/manifest"
 )
-func main()  {
-	configApp, err := manifest.LoadYamlFile()
+
+func main() {
+	applicationSetting, err := manifest.LoadYamlFile("../configApp.yaml")
 
 	if err != nil {
 		log.Fatalf("Error loading YAML: %v", err)
 	}
 
-	log.Printf("Service: %v", configApp.Service.Name)
-	log.Printf("Version: %v", configApp.Service.Version)
+	var result = applicationSetting.Valid()
+	log.Printf("Service: %v", result.HasError())
+
 }

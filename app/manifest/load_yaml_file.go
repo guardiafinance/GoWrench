@@ -9,8 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func LoadYamlFile() (*application_settings.ApplicationSetting, error) {
-	file, err := os.Open("configApp.yaml")
+func LoadYamlFile(pathFile string) (*application_settings.ApplicationSetting, error) {
+	file, err := os.Open(pathFile)
 	if err != nil {
 		return nil, err
 	}
@@ -21,11 +21,11 @@ func LoadYamlFile() (*application_settings.ApplicationSetting, error) {
 		return nil, err
 	}
 
-	var yamlMap application_settings.ApplicationSetting
-	err = yaml.Unmarshal(data, &yamlMap)
+	applicationSetting := new(application_settings.ApplicationSetting)
+	err = yaml.Unmarshal(data, applicationSetting)
 	if err != nil {
 		return nil, err
 	}
 
-	return &yamlMap, nil
+	return applicationSetting, nil
 }
