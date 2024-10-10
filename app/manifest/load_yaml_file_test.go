@@ -109,7 +109,7 @@ actions:
 	os.Rename(tmpFile.Name(), originalFilePath)
 	defer os.Rename(originalFilePath, tmpFile.Name())
 
-	_, err = LoadYamlFile()
+	_, err = LoadYamlFile("../configApp.yaml")
 	if err == nil {
 		t.Fatalf("Expected error when file is not found, but got nil")
 	}
