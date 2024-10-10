@@ -43,7 +43,7 @@ actions:
 	os.Rename(tmpFile.Name(), originalFilePath)
 	defer os.Rename(originalFilePath, tmpFile.Name())
 
-	config, err := LoadYamlFile()
+	config, err := LoadYamlFile("../configApp.yaml")
 	if err != nil {
 		t.Fatalf("LoadYamlFile failed: %v", err)
 	}
@@ -66,7 +66,7 @@ func TestLoadYamlFile_FileNotFound(t *testing.T) {
 	os.Rename(originalFilePath, originalFilePath+".bak")
 	defer os.Rename(originalFilePath+".bak", originalFilePath)
 
-	_, err := LoadYamlFile()
+	_, err := LoadYamlFile("../configApp.yaml")
 	if err == nil {
 		t.Fatalf("Expected error when file is not found, but got nil")
 	}
