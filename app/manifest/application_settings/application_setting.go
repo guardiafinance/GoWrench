@@ -16,7 +16,7 @@ type ApplicationSettings struct {
 func (setting ApplicationSetting) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
-	if setting.Api != nil {
+	if settings.Api != nil {
 		result.AppendValidable(setting.Api)
 	}
 
