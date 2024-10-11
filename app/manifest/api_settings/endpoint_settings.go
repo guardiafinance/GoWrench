@@ -5,7 +5,7 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-type EndpointSetting struct {
+type EndpointSettings struct {
 	Route        string     `yaml:"route"`
 	Method       HttpMethod `yaml:"method"`
 	ActionID     string     `yaml:"actionId"`
@@ -22,7 +22,7 @@ const (
 	HttpMethodDelete HttpMethod = "delete"
 )
 
-func (setting EndpointSetting) Valid() validation.ValidateResult {
+func (setting EndpointSettings) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if len(setting.Route) == 0 {

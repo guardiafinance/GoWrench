@@ -4,11 +4,11 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-type ApiSetting struct {
+type ApiSettings struct {
 	Endpoints []EndpointSetting `yaml:"endpoints"`
 }
 
-func (setting ApiSetting) Valid() validation.ValidateResult {
+func (setting ApiSettings) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if len(setting.Endpoints) == 0 {

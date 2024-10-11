@@ -5,7 +5,7 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-type ActionSetting struct {
+type ActionSettings struct {
 	Id   string                   `yaml:"id"`
 	Type ActionType               `yaml:"type"`
 	Mock *HttpResponseMockSetting `yaml:"mock"`
@@ -17,7 +17,7 @@ const (
 	ActionTypeHttpRequest ActionType = "httpRequest"
 )
 
-func (setting ActionSetting) Valid() validation.ValidateResult {
+func (setting ActionSettings) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if setting.Mock != nil {

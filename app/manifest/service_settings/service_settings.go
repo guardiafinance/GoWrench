@@ -4,12 +4,12 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-type ServiceSetting struct {
+type ServiceSettings struct {
 	Name    string `yaml:"name"`
 	Version string `yaml:"version"`
 }
 
-func (setting ServiceSetting) Valid() validation.ValidateResult {
+func (setting ServiceSettings) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if len(setting.Name) == 0 {
