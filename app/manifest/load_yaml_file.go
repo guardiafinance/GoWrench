@@ -22,7 +22,7 @@ func LoadYamlFile(pathFile string) (*application_settings.ApplicationSetting, er
 	}
 
 	applicationSettings := new(application_settings.ApplicationSetting)
-	err = yaml.Unmarshal(data, applicationSetting)
+	err = yaml.Unmarshal(data, applicationSettings)
 	if err != nil {
 		return nil, err
 	}
