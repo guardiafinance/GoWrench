@@ -7,7 +7,7 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-type AppSettings struct {
+type ApplicationSettings struct {
 	Api     *api_settings.ApiSettings         `yaml:"api"`
 	Actions []action_settings.ActionSettings  `yaml:"actions"`
 	Service *service_settings.ServiceSettings `yaml:"service"`

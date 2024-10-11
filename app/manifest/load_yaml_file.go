@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func LoadYamlFile(pathFile string) (*application_settings.ApplicationSetting, error) {
+func LoadYamlFile(pathFile string) (*application_settings.ApplicationSettings, error) {
 	file, err := os.Open(pathFile)
 	if err != nil {
 		return nil, err
@@ -21,7 +21,7 @@ func LoadYamlFile(pathFile string) (*application_settings.ApplicationSetting, er
 		return nil, err
 	}
 
-	applicationSettings := new(application_settings.ApplicationSetting)
+	applicationSettings := new(application_settings.ApplicationSettings)
 	err = yaml.Unmarshal(data, applicationSettings)
 	if err != nil {
 		return nil, err

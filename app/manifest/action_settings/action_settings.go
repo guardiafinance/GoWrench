@@ -6,9 +6,9 @@ import (
 )
 
 type ActionSettings struct {
-	Id   string                   `yaml:"id"`
-	Type ActionType               `yaml:"type"`
-	Mock *HttpResponseMockSetting `yaml:"mock"`
+	Id   string                    `yaml:"id"`
+	Type ActionType                `yaml:"type"`
+	Mock *HttpResponseMockSettings `yaml:"mock"`
 }
 
 type ActionType string

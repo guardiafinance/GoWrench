@@ -5,7 +5,7 @@ import (
 )
 
 type ApiSettings struct {
-	Endpoints []EndpointSetting `yaml:"endpoints"`
+	Endpoints []EndpointSettings `yaml:"endpoints"`
 }
 
 func (setting ApiSettings) Valid() validation.ValidateResult {
