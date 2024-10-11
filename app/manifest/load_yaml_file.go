@@ -27,5 +27,5 @@ func LoadYamlFile(pathFile string) (*application_settings.ApplicationSetting, er
 		return nil, err
 	}
 
-	return applicationSetting, nil
+	return applicationSettings, nil
 }
