@@ -27,7 +27,7 @@ func (setting ApplicationSetting) Valid() validation.ValidateResult {
 	}
 
 	if setting.Api != nil {
-		result.AppendValidable(setting.Api)
+		result.AppendValidable(settings.Api)
 	}
 
 	return result
