@@ -1,10 +1,19 @@
 package handlers
 
 import (
-	contexts "wrench/app/contexts"
+	settings "wrench/app/manifest/application_settings"
 )
 
-type Handler interface {
-	Do(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext)
-	SetNext(Handler)
+type Chain struct {
+	MapHandle map[string]Handler
+}
+
+func (chain Chain) BuildChain(settings *settings.ApplicationSettings) Handler {
+	var firstHandler = new(FirstHttpHandler)
+
+	// for _, endpoint := range settings.Api.Endpoints {
+	// 	if endpoint.
+	// }
+
+	return firstHandler
 }
