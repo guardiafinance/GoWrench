@@ -14,7 +14,8 @@ type ActionSettings struct {
 type ActionType string
 
 const (
-	ActionTypeHttpRequest ActionType = "httpRequest"
+	ActionTypeHttpRequest     ActionType = "httpRequest"
+	ActionTypeHttpRequestMock ActionType = "httpRequestMock"
 )
 
 func (setting ActionSettings) Valid() validation.ValidateResult {
@@ -32,7 +33,8 @@ func (setting ActionSettings) Valid() validation.ValidateResult {
 		var msg = fmt.Sprintf("actions[%s].type is required", setting.Id)
 		result.AddError(msg)
 	} else {
-		if (setting.Type == ActionTypeHttpRequest) == false {
+		if (setting.Type == ActionTypeHttpRequest ||
+			setting.Type == ActionTypeHttpRequestMock) == false {
 
 			var msg = fmt.Sprintf("actions[%s].type should contain valid value (httpRequest)", setting.Id)
 			result.AddError(msg)
