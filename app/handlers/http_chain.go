@@ -1,5 +1,10 @@
 package handlers
 
+import (
+	contexts "wrench/app/contexts"
+)
+
 type Handler interface {
-	setNext(Handler)
+	Do(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext)
+	SetNext(Handler)
 }
