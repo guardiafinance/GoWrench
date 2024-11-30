@@ -19,8 +19,9 @@ func LoadApiEndpoint(endpoints []settings.EndpointSettings) {
 		if route[0] != '/' {
 			route = "/" + route
 		}
-
-		r.HandleFunc(route, handler.FirstHttp).Methods(method)
+		var delegate = new(handler.RequestDelegate)
+		delegate.SetEndpoint(&endpoint)
+		r.HandleFunc(route, delegate.FirstHttp).Methods(method)
 		initialPage.Append("Route: <i>" + route + "</i> Method: <i>" + method + "</i>")
 	}
 
