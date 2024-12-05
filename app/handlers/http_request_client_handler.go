@@ -66,8 +66,8 @@ func mpaHttpResponseHeaders(response *client.HttpClientResponseData, mapResponse
 			destinationKey = sourceKey
 		}
 
-		headerValue := response.HttpClientResponse.Header[sourceKey]
-		mapResponseHeaderResult[destinationKey] = headerValue[0]
+		headerValue := response.HttpClientResponse.Header.Get(sourceKey)
+		mapResponseHeaderResult[destinationKey] = headerValue
 	}
 
 	return mapResponseHeaderResult
