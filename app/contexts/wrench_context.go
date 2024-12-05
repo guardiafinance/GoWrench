@@ -6,4 +6,5 @@ import (
 
 type WrenchContext struct {
 	ResponseWriter *http.ResponseWriter
+	Request        *http.Request
 }

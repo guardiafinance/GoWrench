@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	contexts "wrench/app/contexts"
 )
 
@@ -11,9 +10,18 @@ type HttpLastHandler struct {
 
 func (httpLast *HttpLastHandler) Do(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 	var w = *wrenchContext.ResponseWriter
-	w.WriteHeader(bodyContext.HttpStatusCode)
-	json.NewEncoder(w).Encode(bodyContext.Body)
 
+	header := w.Header()
+	header.Set("Content-Type", bodyContext.ContentType)
+
+	if bodyContext.Headers != nil {
+		for key, value := range bodyContext.Headers {
+			header.Set(key, value)
+		}
+	}
+
+	w.WriteHeader(bodyContext.HttpStatusCode)
+	w.Write([]byte(bodyContext.Body))
 	if httpLast.Next != nil {
 		httpLast.Next.Do(wrenchContext, bodyContext)
 	}

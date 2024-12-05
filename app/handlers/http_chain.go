@@ -37,6 +37,13 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 			currentHandler = httpRequestHadler
 		}
 
+		if action.Type == action_settings.ActionTypeHttpRequestMock {
+			var httpRequestMockHadler = new(HttpRequestClientMockHandler)
+			httpRequestMockHadler.ActionSettings = action
+			currentHandler.SetNext(httpRequestMockHadler)
+			currentHandler = httpRequestMockHadler
+		}
+
 		currentHandler.SetNext(new(HttpLastHandler))
 
 		chain.MapHandle[endpoint.Route] = firstHandler

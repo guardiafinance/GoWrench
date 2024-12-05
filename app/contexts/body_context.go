@@ -3,12 +3,6 @@ package contexts
 type BodyContext struct {
 	Body           string
 	HttpStatusCode int
+	ContentType    string
+	Headers        map[string]string
 }
-
-// func (bodyContext *BodyContext) SetBody(body string) {
-// 	bodyContext.Body = body
-// }
-
-// func (bodyContext *BodyContext) SetHttpStatusCode(httpStatusCode int) {
-// 	bodyContext.HttpStatusCode = httpStatusCode
-// }
