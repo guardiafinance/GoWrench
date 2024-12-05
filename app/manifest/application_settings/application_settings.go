@@ -8,6 +8,8 @@ import (
 	"wrench/app/manifest/validation"
 )
 
+var ApplicationSettingsStatic *ApplicationSettings
+
 type ApplicationSettings struct {
 	Api     *api_settings.ApiSettings         `yaml:"api"`
 	Actions []action_settings.ActionSettings  `yaml:"actions"`

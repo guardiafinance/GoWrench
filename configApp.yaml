@@ -6,7 +6,7 @@ service:
 
 api:
   endpoints:
-    - route: api/customer
+    - route: /api/customer
       method: get
       actionId: get_customer
     

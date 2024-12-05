@@ -1,7 +1,6 @@
 package startup
 
 import (
-	"net/http"
 	"strings"
 	handler "wrench/app/handlers"
 	settings "wrench/app/manifest/api_settings"
@@ -9,16 +8,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func LoadApiEndpoint(endpoints []settings.EndpointSettings) {
+func LoadApiEndpoint(endpoints []settings.EndpointSettings) *mux.Router {
 	r := mux.NewRouter()
 	initialPage := new(InitialPage)
 
 	for _, endpoint := range endpoints {
 		method := strings.ToUpper(string(endpoint.Method))
 		route := endpoint.Route
-		if route[0] != '/' {
-			route = "/" + route
-		}
+
 		var delegate = new(handler.RequestDelegate)
 		delegate.SetEndpoint(&endpoint)
 		r.HandleFunc(route, delegate.FirstHttp).Methods(method)
@@ -26,6 +23,5 @@ func LoadApiEndpoint(endpoints []settings.EndpointSettings) {
 	}
 
 	r.HandleFunc("/", initialPage.WriteInitialPage).Methods("GET")
-
-	http.ListenAndServe(":8085", r)
+	return r
 }

@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"wrench/app/manifest"
+	"wrench/app/manifest/application_settings"
 	startup "wrench/app/startup"
 )
 
 func main() {
 	applicationSetting, err := manifest.LoadYamlFile("../../configApp.yaml")
+	application_settings.ApplicationSettingsStatic = applicationSetting
 
 	if err != nil {
 		log.Fatalf("Error loading YAML: %v", err)
@@ -22,6 +25,7 @@ func main() {
 			fmt.Println(error)
 		}
 	} else {
-		startup.LoadApplicationSettings(applicationSetting)
+		var router = startup.LoadApplicationSettings(applicationSetting)
+		http.ListenAndServe(":8085", router)
 	}
 }

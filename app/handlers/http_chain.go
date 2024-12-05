@@ -1,19 +1,48 @@
 package handlers
 
 import (
+	"log"
+	action_settings "wrench/app/manifest/action_settings"
 	settings "wrench/app/manifest/application_settings"
 )
+
+var ChainStatic *Chain = new(Chain)
 
 type Chain struct {
 	MapHandle map[string]Handler
 }
 
-func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) Handler {
-	var firstHandler = new(HttpFirstHandler)
+func (chain *Chain) GetStatic() *Chain {
+	return ChainStatic
+}
 
-	// for _, endpoint := range settings.Api.Endpoints {
-	// 	if endpoint.
-	// }
+func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
+	chain.MapHandle = make(map[string]Handler)
+	for _, endpoint := range settings.Api.Endpoints {
 
-	return firstHandler
+		var firstHandler = new(HttpFirstHandler)
+		var currentHandler Handler
+		currentHandler = firstHandler
+
+		var action, err = settings.GetActionById(endpoint.ActionID)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if action.Type == action_settings.ActionTypeHttpRequest {
+			var httpRequestHadler = new(HttpRequestClientHandler)
+			httpRequestHadler.ActionSettings = action
+			currentHandler.SetNext(httpRequestHadler)
+			currentHandler = httpRequestHadler
+		}
+
+		currentHandler.SetNext(new(HttpLastHandler))
+
+		chain.MapHandle[endpoint.Route] = firstHandler
+	}
+}
+
+func (chain *Chain) GetByRoute(route string) Handler {
+	return chain.MapHandle[route]
 }

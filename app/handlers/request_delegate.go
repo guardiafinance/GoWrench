@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	contexts "wrench/app/contexts"
 	settings "wrench/app/manifest/api_settings"
+	appSetting "wrench/app/manifest/application_settings"
 )
 
 type RequestDelegate struct {
@@ -12,15 +14,21 @@ type RequestDelegate struct {
 
 func (request *RequestDelegate) FirstHttp(w http.ResponseWriter, r *http.Request) {
 	httpFirstHandler := new(HttpFirstHandler)
-	httpLastHandler := new(HttpLastHandler)
-	clientHander := new(HttpRequestClientHandler)
-	httpFirstHandler.SetNext(clientHander)
-	clientHander.SetNext(httpLastHandler)
+	requestURI := r.RequestURI
+	appSetting := appSetting.ApplicationSettingsStatic
+
+	endpoint, err := appSetting.Api.GetEndpointByRoute(requestURI)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	var chain = ChainStatic.GetStatic()
+	var handler = chain.GetByRoute(endpoint.Route)
 
 	bodyContext := new(contexts.BodyContext)
 	wrenchContext := new(contexts.WrenchContext)
 	wrenchContext.ResponseWriter = &w
-
+	httpFirstHandler.SetNext(handler)
 	httpFirstHandler.Do(wrenchContext, bodyContext)
 }
 

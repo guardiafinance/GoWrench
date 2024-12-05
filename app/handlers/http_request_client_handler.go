@@ -5,10 +5,12 @@ import (
 	"io"
 	"net/http"
 	contexts "wrench/app/contexts"
+	settings "wrench/app/manifest/action_settings"
 )
 
 type HttpRequestClientHandler struct {
-	Next Handler
+	Next           Handler
+	ActionSettings *settings.ActionSettings
 }
 
 func (httpRequestClientHandler *HttpRequestClientHandler) Do(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {

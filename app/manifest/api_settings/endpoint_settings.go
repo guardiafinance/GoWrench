@@ -30,6 +30,11 @@ func (setting EndpointSettings) Valid() validation.ValidateResult {
 		result.AddError(msg)
 	}
 
+	if setting.Route[0] != '/' {
+		var msg = fmt.Sprintf("api.endpoints[%s].route should start with '/' ex: /api/hello", setting.ActionID)
+		result.AddError(msg)
+	}
+
 	if len(setting.Method) == 0 {
 		var msg = fmt.Sprintf("api.endpoints[%s].method is required", setting.ActionID)
 		result.AddError(msg)
