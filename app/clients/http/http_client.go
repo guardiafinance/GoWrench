@@ -23,9 +23,10 @@ type HttpClientRequestData struct {
 }
 
 type HttpClientResponseData struct {
-	Body       []byte
-	Headers    map[string]string
-	StatusCode int
+	Body               []byte
+	Headers            map[string]string
+	StatusCode         int
+	HttpClientResponse *http.Response
 }
 
 func HttpClientDo(ctx context.Context, request *HttpClientRequestData) (*HttpClientResponseData, error) {
@@ -67,5 +68,6 @@ func HttpClientDo(ctx context.Context, request *HttpClientRequestData) (*HttpCli
 	response := new(HttpClientResponseData)
 	response.Body = respBody
 	response.StatusCode = resp.StatusCode
+	response.HttpClientResponse = resp
 	return response, nil
 }

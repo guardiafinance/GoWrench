@@ -2,14 +2,16 @@ package action_settings
 
 import (
 	"fmt"
+	"strings"
 	"wrench/app/manifest/types"
 	"wrench/app/manifest/validation"
 )
 
 type HttpRequestSetting struct {
-	Method       types.HttpMethod  `yaml:"method"`
-	Url          string            `yaml:"url"`
-	FixedHeaders map[string]string `yaml:"fixedHeaders"`
+	Method            types.HttpMethod  `yaml:"method"`
+	Url               string            `yaml:"url"`
+	MapFixedHeaders   map[string]string `yaml:"mapFixedHeaders"`
+	MapResponseHeader []string          `yaml:"mapResponseHeader"`
 }
 
 func (setting HttpRequestSetting) Valid() validation.ValidateResult {
@@ -32,6 +34,19 @@ func (setting HttpRequestSetting) Valid() validation.ValidateResult {
 
 	if len(setting.Url) == 0 {
 		result.AddError("api.actions.request.url is required")
+	}
+
+	if setting.MapResponseHeader != nil {
+		for _, mapHeader := range setting.MapResponseHeader {
+			mapSplitted := strings.Split(mapHeader, ":")
+			if len(mapSplitted) > 2 {
+				result.AddError("api.actions.request.mapResponseHeader should contains only one splitter ':'")
+			}
+
+			if len(mapHeader) == 0 {
+				result.AddError("api.actions.request.mapResponseHeader itens can't contains empty values")
+			}
+		}
 	}
 
 	return result

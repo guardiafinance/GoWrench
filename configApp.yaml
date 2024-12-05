@@ -22,16 +22,20 @@ actions:
       contentType: "application/json"
       statusCode: 201
       headers: 
-       "key1": "value1"
-       "key2": "value2"
+       "mock1": "value1"
+       "mock2": "value2"
+       "mock3": "value2"
 
   - id: get_customer
     type: httpRequest
     request:
       method: get
       url: 'http://localhost:8085/api/mock'
-      fixedHeaders: 
-       "key1": "value1"
-       "key2": "value2"
+      mapResponseHeader:
+        - "mock1"
+        - "mock2:change2"
+      mapFixedHeaders:
+        "fixed1": "value1"
+        "fixed2": "value2"
 
 

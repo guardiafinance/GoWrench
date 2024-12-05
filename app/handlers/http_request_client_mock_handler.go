@@ -13,10 +13,12 @@ type HttpRequestClientMockHandler struct {
 
 func (httpRequestClientMockHandler *HttpRequestClientMockHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
-	bodyContext.Body = httpRequestClientMockHandler.ActionSettings.Mock.Body
-	bodyContext.ContentType = httpRequestClientMockHandler.ActionSettings.Mock.ContentType
-	bodyContext.HttpStatusCode = httpRequestClientMockHandler.ActionSettings.Mock.StatusCode
-	bodyContext.Headers = httpRequestClientMockHandler.ActionSettings.Mock.Headers
+	if wrenchContext.HasError == false {
+		bodyContext.Body = httpRequestClientMockHandler.ActionSettings.Mock.Body
+		bodyContext.ContentType = httpRequestClientMockHandler.ActionSettings.Mock.ContentType
+		bodyContext.HttpStatusCode = httpRequestClientMockHandler.ActionSettings.Mock.StatusCode
+		bodyContext.Headers = httpRequestClientMockHandler.ActionSettings.Mock.Headers
+	}
 
 	if httpRequestClientMockHandler.Next != nil {
 		httpRequestClientMockHandler.Next.Do(ctx, wrenchContext, bodyContext)
