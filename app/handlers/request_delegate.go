@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	contexts "wrench/app/contexts"
@@ -13,6 +14,8 @@ type RequestDelegate struct {
 }
 
 func (request *RequestDelegate) FirstHttp(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
 	httpFirstHandler := new(HttpFirstHandler)
 	requestURI := r.RequestURI
 	appSetting := appSetting.ApplicationSettingsStatic
@@ -29,7 +32,7 @@ func (request *RequestDelegate) FirstHttp(w http.ResponseWriter, r *http.Request
 	wrenchContext := new(contexts.WrenchContext)
 	wrenchContext.ResponseWriter = &w
 	httpFirstHandler.SetNext(handler)
-	httpFirstHandler.Do(wrenchContext, bodyContext)
+	httpFirstHandler.Do(ctx, wrenchContext, bodyContext)
 }
 
 func (request *RequestDelegate) SetEndpoint(endpoint *settings.EndpointSettings) {

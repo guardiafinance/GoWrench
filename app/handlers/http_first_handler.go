@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	contexts "wrench/app/contexts"
 )
 
@@ -8,9 +9,9 @@ type HttpFirstHandler struct {
 	Next Handler
 }
 
-func (httpFirst *HttpFirstHandler) Do(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
+func (httpFirst *HttpFirstHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 	if httpFirst.Next != nil {
-		httpFirst.Next.Do(wrenchContext, bodyContext)
+		httpFirst.Next.Do(ctx, wrenchContext, bodyContext)
 	}
 }
 

@@ -4,14 +4,14 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-type HttpResponseMockSettings struct {
+type HttpRequestMockSetting struct {
 	Body        string            `yaml:"body"`
 	ContentType string            `default:"application/json" yaml:"contentType"`
 	Headers     map[string]string `yaml:"headers"`
 	StatusCode  int               `default:"200" yaml:"statusCode"`
 }
 
-func (setting HttpResponseMockSettings) Valid() validation.ValidateResult {
+func (setting HttpRequestMockSetting) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if len(setting.Body) == 0 {

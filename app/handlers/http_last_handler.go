@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	contexts "wrench/app/contexts"
 )
 
@@ -8,7 +9,7 @@ type HttpLastHandler struct {
 	Next Handler
 }
 
-func (httpLast *HttpLastHandler) Do(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
+func (httpLast *HttpLastHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 	var w = *wrenchContext.ResponseWriter
 
 	header := w.Header()
@@ -22,8 +23,9 @@ func (httpLast *HttpLastHandler) Do(wrenchContext *contexts.WrenchContext, bodyC
 
 	w.WriteHeader(bodyContext.HttpStatusCode)
 	w.Write([]byte(bodyContext.Body))
+
 	if httpLast.Next != nil {
-		httpLast.Next.Do(wrenchContext, bodyContext)
+		httpLast.Next.Do(ctx, wrenchContext, bodyContext)
 	}
 }
 

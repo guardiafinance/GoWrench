@@ -6,12 +6,16 @@ service:
 
 api:
   endpoints:
+    - route: /api/mock
+      method: get
+      actionId: get_customer_mock
+
     - route: /api/customer
       method: get
       actionId: get_customer
-    
+      
 actions:
-  - id: get_customer
+  - id: get_customer_mock
     type: httpRequestMock
     mock:
       body: "{ 'Say':'Hello' }"
@@ -20,3 +24,14 @@ actions:
       headers: 
        "key1": "value1"
        "key2": "value2"
+
+  - id: get_customer
+    type: httpRequest
+    request:
+      method: get
+      url: 'http://localhost:8085/api/mock'
+      fixedHeaders: 
+       "key1": "value1"
+       "key2": "value2"
+
+

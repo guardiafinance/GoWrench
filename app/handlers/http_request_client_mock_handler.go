@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	contexts "wrench/app/contexts"
 	settings "wrench/app/manifest/action_settings"
 )
@@ -10,7 +11,7 @@ type HttpRequestClientMockHandler struct {
 	ActionSettings *settings.ActionSettings
 }
 
-func (httpRequestClientMockHandler *HttpRequestClientMockHandler) Do(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
+func (httpRequestClientMockHandler *HttpRequestClientMockHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
 	bodyContext.Body = httpRequestClientMockHandler.ActionSettings.Mock.Body
 	bodyContext.ContentType = httpRequestClientMockHandler.ActionSettings.Mock.ContentType
@@ -18,7 +19,7 @@ func (httpRequestClientMockHandler *HttpRequestClientMockHandler) Do(wrenchConte
 	bodyContext.Headers = httpRequestClientMockHandler.ActionSettings.Mock.Headers
 
 	if httpRequestClientMockHandler.Next != nil {
-		httpRequestClientMockHandler.Next.Do(wrenchContext, bodyContext)
+		httpRequestClientMockHandler.Next.Do(ctx, wrenchContext, bodyContext)
 	}
 }
 

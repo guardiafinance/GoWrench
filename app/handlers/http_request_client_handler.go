@@ -1,10 +1,9 @@
 package handlers
 
 import (
-	"fmt"
-	"io"
-	"net/http"
-	contexts "wrench/app/contexts"
+	"context"
+	client "wrench/app/clients/http"
+	"wrench/app/contexts"
 	settings "wrench/app/manifest/action_settings"
 )
 
@@ -13,26 +12,25 @@ type HttpRequestClientHandler struct {
 	ActionSettings *settings.ActionSettings
 }
 
-func (httpRequestClientHandler *HttpRequestClientHandler) Do(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
-	resp, err := http.Get("http://localhost:8085")
+func (httpRequestClientHandler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
+
+	request := new(client.HttpClientRequestData)
+	request.Body = []byte(bodyContext.Body)
+	request.Method = string(httpRequestClientHandler.ActionSettings.Request.Method)
+	request.Url = httpRequestClientHandler.ActionSettings.Request.Url
+
+	response, err := client.HttpClientDo(ctx, request)
 
 	if err != nil {
-		fmt.Printf("error")
+		//TODO add breaking setting error status
 	}
 
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	bodyString := string(body[:])
-
-	if err != nil {
-		fmt.Println(bodyString)
-	}
-
-	bodyContext.Body = bodyString
-	bodyContext.HttpStatusCode = resp.StatusCode
+	bodyContext.Body = string(response.Body)
+	bodyContext.HttpStatusCode = response.StatusCode
+	bodyContext.SetHeaders(httpRequestClientHandler.ActionSettings.Request.FixedHeaders)
 
 	if httpRequestClientHandler.Next != nil {
-		httpRequestClientHandler.Next.Do(wrenchContext, bodyContext)
+		httpRequestClientHandler.Next.Do(ctx, wrenchContext, bodyContext)
 	}
 }
 
