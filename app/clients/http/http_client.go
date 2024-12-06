@@ -60,7 +60,7 @@ func HttpClientDo(ctx context.Context, request *HttpClientRequestData) (*HttpCli
 		body = bytes.NewBuffer(request.Body)
 	}
 
-	req, err := http.NewRequest(method, request.Url, body)
+	req, err := http.NewRequestWithContext(ctx, method, request.Url, body)
 
 	if err != nil {
 		fmt.Println("Error creating request:", err)
