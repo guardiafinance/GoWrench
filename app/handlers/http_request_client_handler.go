@@ -13,14 +13,16 @@ type HttpRequestClientHandler struct {
 	ActionSettings *settings.ActionSettings
 }
 
-func (httpRequestClientHandler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
+func (handler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
 	if wrenchContext.HasError == false {
 
 		request := new(client.HttpClientRequestData)
 		request.Body = []byte(bodyContext.Body)
-		request.Method = string(httpRequestClientHandler.ActionSettings.Request.Method)
-		request.Url = httpRequestClientHandler.ActionSettings.Request.Url
+		request.Method = string(handler.ActionSettings.Http.Request.Method)
+		request.Url = handler.ActionSettings.Http.Request.Url
+		request.SetHeaders(handler.ActionSettings.Http.Request.MapFixedHeaders)
+		request.SetHeaders(mpaHttpRequestHeaders(wrenchContext, handler.ActionSettings.Http.Request.MapRequestHeaders))
 
 		response, err := client.HttpClientDo(ctx, request)
 
@@ -34,17 +36,28 @@ func (httpRequestClientHandler *HttpRequestClientHandler) Do(ctx context.Context
 
 		bodyContext.Body = string(response.Body)
 		bodyContext.HttpStatusCode = response.StatusCode
-		bodyContext.SetHeaders(httpRequestClientHandler.ActionSettings.Request.MapFixedHeaders)
-		bodyContext.SetHeaders(mpaHttpResponseHeaders(response, httpRequestClientHandler.ActionSettings.Request.MapResponseHeader))
+		if handler.ActionSettings.Http.Response != nil {
+			bodyContext.SetHeaders(handler.ActionSettings.Http.Response.MapFixedHeaders)
+			bodyContext.SetHeaders(mpaHttpResponseHeaders(response, handler.ActionSettings.Http.Response.MapResponseHeaders))
+		}
 	}
 
-	if httpRequestClientHandler.Next != nil {
-		httpRequestClientHandler.Next.Do(ctx, wrenchContext, bodyContext)
+	if handler.Next != nil {
+		handler.Next.Do(ctx, wrenchContext, bodyContext)
 	}
 }
 
 func (httpRequestClientHandler *HttpRequestClientHandler) SetNext(handler Handler) {
 	httpRequestClientHandler.Next = handler
+}
+
+func mpaHttpRequestHeaders(wrenchContext *contexts.WrenchContext, mapRequestHeader []string) map[string]string {
+	if mapRequestHeader == nil {
+		return nil
+	}
+	mapRequestHeaderResult := make(map[string]string)
+
+	return mapRequestHeaderResult
 }
 
 func mpaHttpResponseHeaders(response *client.HttpClientResponseData, mapResponseHeader []string) map[string]string {

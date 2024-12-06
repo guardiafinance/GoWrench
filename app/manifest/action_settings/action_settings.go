@@ -6,10 +6,9 @@ import (
 )
 
 type ActionSettings struct {
-	Id      string                  `yaml:"id"`
-	Type    ActionType              `yaml:"type"`
-	Request *HttpRequestSetting     `yaml:"request"`
-	Mock    *HttpRequestMockSetting `yaml:"mock"`
+	Id   string       `yaml:"id"`
+	Type ActionType   `yaml:"type"`
+	Http *HttpSetting `yaml:"http"`
 }
 
 type ActionType string
@@ -39,37 +38,12 @@ func (setting ActionSettings) Valid() validation.ValidateResult {
 	}
 
 	if setting.Type == ActionTypeHttpRequest {
-		setting.ValidTypeActionTypeHttpRequest(&result)
+		setting.Http.ValidTypeActionTypeHttpRequest(&result)
 	}
 
 	if setting.Type == ActionTypeHttpRequestMock {
-		setting.ValidTypeActionTypeHttpRequestMock(&result)
+		setting.Http.ValidTypeActionTypeHttpRequestMock(&result)
 	}
 
 	return result
-}
-
-func (setting ActionSettings) ValidTypeActionTypeHttpRequest(result *validation.ValidateResult) {
-
-	if setting.Request == nil {
-		var msg = fmt.Sprintf("actions[%s].request should be nil", setting.Id)
-		result.AddError(msg)
-	} else {
-		result.AppendValidable(setting.Request)
-	}
-
-	if setting.Mock != nil {
-		var msg = fmt.Sprintf("actions[%s].mock should be nil", setting.Id)
-		result.AddError(msg)
-	}
-}
-
-func (setting ActionSettings) ValidTypeActionTypeHttpRequestMock(result *validation.ValidateResult) {
-
-	if setting.Mock != nil {
-		result.AppendValidable(setting.Mock)
-	} else {
-		var msg = fmt.Sprintf("actions[%s].mock is required", setting.Id)
-		result.AddError(msg)
-	}
 }

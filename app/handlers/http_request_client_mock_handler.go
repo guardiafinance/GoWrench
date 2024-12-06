@@ -14,10 +14,10 @@ type HttpRequestClientMockHandler struct {
 func (httpRequestClientMockHandler *HttpRequestClientMockHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
 	if wrenchContext.HasError == false {
-		bodyContext.Body = httpRequestClientMockHandler.ActionSettings.Mock.Body
-		bodyContext.ContentType = httpRequestClientMockHandler.ActionSettings.Mock.ContentType
-		bodyContext.HttpStatusCode = httpRequestClientMockHandler.ActionSettings.Mock.StatusCode
-		bodyContext.Headers = httpRequestClientMockHandler.ActionSettings.Mock.Headers
+		bodyContext.Body = httpRequestClientMockHandler.ActionSettings.Http.Mock.Body
+		bodyContext.ContentType = httpRequestClientMockHandler.ActionSettings.Http.Mock.ContentType
+		bodyContext.HttpStatusCode = httpRequestClientMockHandler.ActionSettings.Http.Mock.StatusCode
+		bodyContext.Headers = httpRequestClientMockHandler.ActionSettings.Http.Mock.Headers
 	}
 
 	if httpRequestClientMockHandler.Next != nil {

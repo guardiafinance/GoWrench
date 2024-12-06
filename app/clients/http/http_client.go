@@ -29,6 +29,28 @@ type HttpClientResponseData struct {
 	HttpClientResponse *http.Response
 }
 
+func (httpClientRequestData *HttpClientRequestData) SetHeaders(headers map[string]string) {
+	if headers != nil {
+		if httpClientRequestData.Headers == nil {
+			httpClientRequestData.Headers = make(map[string]string)
+		}
+
+		for key, value := range headers {
+			httpClientRequestData.Headers[key] = value
+		}
+	}
+}
+
+func (httpClientRequestData *HttpClientRequestData) SetHeader(key string, value string) {
+	if len(key) > 0 {
+		if httpClientRequestData.Headers == nil {
+			httpClientRequestData.Headers = make(map[string]string)
+		}
+
+		httpClientRequestData.Headers[key] = value
+	}
+}
+
 func HttpClientDo(ctx context.Context, request *HttpClientRequestData) (*HttpClientResponseData, error) {
 	client := GetHttpClientStatic()
 	method := strings.ToUpper(request.Method)
