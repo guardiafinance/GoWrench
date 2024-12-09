@@ -4,6 +4,13 @@ service:
   name: test-app
   version: 1.0.0
 
+idpAuthentications:
+  - id: auth_client
+    type: clientCredentials
+    authEndpoint: "{{KEYCLOCK_AUTH_ENDPOINT}}"
+    clientId: "{{KEYCLOCK_AUTH_CLIENT_ID}}"
+    clientSecret: "{{KEYCLOCK_AUTH_CLIENT_SECRET}}"
+
 api:
   endpoints:
     - route: /api/mock

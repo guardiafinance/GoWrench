@@ -35,6 +35,8 @@ func main() {
 			fmt.Println(error)
 		}
 	} else {
+		startup.LoadIdpAuthentication()
+
 		var router = startup.LoadApplicationSettings(applicationSetting)
 		port := getPort()
 		http.ListenAndServe(port, router)
