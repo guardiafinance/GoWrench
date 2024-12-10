@@ -35,8 +35,7 @@ func main() {
 			fmt.Println(error)
 		}
 	} else {
-		go startup.LoadIdpAuthentication()
-
+		go startup.LoadTokenCredentialAuthentication()
 		var router = startup.LoadApplicationSettings(applicationSetting)
 		port := getPort()
 		http.ListenAndServe(port, router)

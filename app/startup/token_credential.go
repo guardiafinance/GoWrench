@@ -9,45 +9,44 @@ import (
 	"time"
 	client "wrench/app/clients/http"
 	"wrench/app/manifest/application_settings"
-	"wrench/app/manifest/idp"
+	credential "wrench/app/manifest/token_credential"
 )
 
-var idpTokens map[string]*JwtData
+var tokenCredentials map[string]*JwtData
 
-func GetIdpToken(idpId string) *JwtData {
-	if idpTokens == nil {
+func GetTokenCredential(tokenCredentialId string) *JwtData {
+	if tokenCredentials == nil {
 		return nil
 	}
 
-	return idpTokens[idpId]
+	return tokenCredentials[tokenCredentialId]
 }
 
-func LoadIdpAuthentication() {
+func LoadTokenCredentialAuthentication() {
 	app_settings := application_settings.ApplicationSettingsStatic
 
-	if len(app_settings.IDP) > 0 {
-		if idpTokens == nil {
-			idpTokens = make(map[string]*JwtData)
+	if len(app_settings.TokenCredentials) > 0 {
+		if tokenCredentials == nil {
+			tokenCredentials = make(map[string]*JwtData)
 		}
 
 		for {
-			for _, idpSetting := range app_settings.IDP {
+			for _, setting := range app_settings.TokenCredentials {
 
-				jwtData := GetIdpToken(idpSetting.Id)
-
+				jwtData := GetTokenCredential(setting.Id)
 				if jwtData != nil {
 					if jwtData.IsExpired(5) == false {
 						continue
 					}
 				}
 
-				jwtData, err := authenticateClientCredentials(idpSetting)
+				jwtData, err := authenticateClientCredentials(setting)
 				if err != nil {
 					continue
 					// TODO setting error to unhealthy api
 				}
 				jwtData.LoadJwtPayload()
-				idpTokens[idpSetting.Id] = jwtData
+				tokenCredentials[setting.Id] = jwtData
 			}
 
 			time.Sleep(2 * time.Minute)
@@ -55,16 +54,16 @@ func LoadIdpAuthentication() {
 	}
 }
 
-func authenticateClientCredentials(idpSetting *idp.IdpAuthenticationSetting) (*JwtData, error) {
+func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (*JwtData, error) {
 	request := new(client.HttpClientRequestData)
 	data := url.Values{}
-	data.Set("client_id", idpSetting.ClientId)
-	data.Set("client_secret", idpSetting.ClientSecret)
+	data.Set("client_id", setting.ClientId)
+	data.Set("client_secret", setting.ClientSecret)
 	data.Set("grant_type", "client_credentials")
 
 	request.Body = []byte(data.Encode())
 	request.Method = "POST"
-	request.Url = idpSetting.AuthEndpoint
+	request.Url = setting.AuthEndpoint
 
 	request.SetHeader("Content-Type", "application/x-www-form-urlencoded")
 	ctx := context.Background()

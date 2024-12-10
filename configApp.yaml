@@ -4,7 +4,7 @@ service:
   name: test-app
   version: 1.0.0
 
-idpAuthentications:
+tokenCredentials:
   - id: auth_client
     type: clientCredentials
     authEndpoint: "{{KEYCLOCK_AUTH_ENDPOINT}}"
