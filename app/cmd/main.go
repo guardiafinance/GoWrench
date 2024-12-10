@@ -8,6 +8,7 @@ import (
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
 	"wrench/app/startup"
+	"wrench/app/token_credentials"
 
 	"gopkg.in/yaml.v3"
 )
@@ -35,7 +36,7 @@ func main() {
 			fmt.Println(error)
 		}
 	} else {
-		go startup.LoadTokenCredentialAuthentication()
+		go token_credentials.LoadTokenCredentialAuthentication()
 		var router = startup.LoadApplicationSettings(applicationSetting)
 		port := getPort()
 		http.ListenAndServe(port, router)

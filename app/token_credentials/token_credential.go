@@ -1,4 +1,4 @@
-package startup
+package token_credentials
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 
 var tokenCredentials map[string]*JwtData
 
-func GetTokenCredential(tokenCredentialId string) *JwtData {
+func GetTokenCredentialById(tokenCredentialId string) *JwtData {
 	if tokenCredentials == nil {
 		return nil
 	}
@@ -33,7 +33,7 @@ func LoadTokenCredentialAuthentication() {
 		for {
 			for _, setting := range app_settings.TokenCredentials {
 
-				jwtData := GetTokenCredential(setting.Id)
+				jwtData := GetTokenCredentialById(setting.Id)
 				if jwtData != nil {
 					if jwtData.IsExpired(5) == false {
 						continue

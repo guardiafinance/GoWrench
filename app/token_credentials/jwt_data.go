@@ -1,4 +1,4 @@
-package startup
+package token_credentials
 
 import (
 	"encoding/base64"

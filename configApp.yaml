@@ -21,6 +21,10 @@ api:
       method: get
       actionId: get_customer
       
+    - route: /api/hello
+      method: get
+      actionId: get_hello
+
 actions:
   - id: get_customer_mock
     type: httpRequestMock
@@ -54,7 +58,11 @@ actions:
           "resp1": "value1"
           "resp2": "value2"
 
-
-contractMap:
-  id: before_customer
+  - id: get_hello
+    type: httpRequest
+    http:
+      request:
+        method: get
+        tokenCredentialId: auth_client
+        url: 'http://localhost:5250/hello'
   
