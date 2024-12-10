@@ -7,7 +7,7 @@ import (
 	"os"
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
-	startup "wrench/app/startup"
+	"wrench/app/startup"
 
 	"gopkg.in/yaml.v3"
 )
@@ -35,7 +35,7 @@ func main() {
 			fmt.Println(error)
 		}
 	} else {
-		startup.LoadIdpAuthentication()
+		go startup.LoadIdpAuthentication()
 
 		var router = startup.LoadApplicationSettings(applicationSetting)
 		port := getPort()
