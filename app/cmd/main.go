@@ -8,7 +8,7 @@ import (
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
 	"wrench/app/startup"
-	"wrench/app/token_credentials"
+	"wrench/app/startup/token_credentials"
 
 	"gopkg.in/yaml.v3"
 )

@@ -72,20 +72,22 @@ func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (
 
 	if err != nil {
 		// TODO add error flow
-	}
+		return nil, err
+	} else {
 
-	if response.StatusCodeSuccess() {
-		token := string(response.Body)
-		tokenArray := []byte(token)
-		jwtData := new(JwtData)
+		if response.StatusCodeSuccess() {
+			token := string(response.Body)
+			tokenArray := []byte(token)
+			jwtData := new(JwtData)
 
-		jsonErr := json.Unmarshal(tokenArray, &jwtData)
-		if jsonErr != nil {
-			return nil, jsonErr
+			jsonErr := json.Unmarshal(tokenArray, &jwtData)
+			if jsonErr != nil {
+				return nil, jsonErr
+			}
+
+			return jwtData, nil
 		}
 
-		return jwtData, nil
+		return nil, errors.New(fmt.Sprintf("Can't get jwtToken response_status_code: %v", response.StatusCode))
 	}
-
-	return nil, errors.New(fmt.Sprintf("Can't get jwtToken response_status_code: %v", response.StatusCode))
 }

@@ -7,7 +7,7 @@ import (
 	client "wrench/app/clients/http"
 	"wrench/app/contexts"
 	settings "wrench/app/manifest/action_settings"
-	"wrench/app/token_credentials"
+	"wrench/app/startup/token_credentials"
 )
 
 type HttpRequestClientHandler struct {
