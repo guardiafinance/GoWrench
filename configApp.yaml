@@ -20,6 +20,10 @@ api:
     - route: /api/customer
       method: get
       actionId: get_customer
+
+    - route: /api/customer
+      method: post
+      actionId: post_customer
       
     - route: /api/hello
       method: get
@@ -44,11 +48,6 @@ actions:
       request:
         method: get
         url: 'http://localhost:{{PORT}}/api/mock'
-        trigger:
-          before:
-            contractMapId: before_customer_create
-          after:
-            contractMapId: after_customer_create
         mapRequestHeaders:
           - "mock1"
           - "mock2:change2"
@@ -62,6 +61,18 @@ actions:
         mapFixedHeaders:
           "resp1": "value1"
           "resp2": "value2"
+
+  - id: post_customer
+    type: httpRequest
+    trigger:
+      before:
+        contractMapId: before_customer_create
+      after:
+        contractMapId: after_customer_create
+    http:
+      request:
+        method: get
+        url: 'http://localhost:{{PORT}}/api/mock'
 
   - id: get_hello
     type: httpRequest

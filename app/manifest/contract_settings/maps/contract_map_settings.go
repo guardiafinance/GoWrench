@@ -5,13 +5,13 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-type ContractMap struct {
+type ContractMapSetting struct {
 	Id         string   `yaml:"id"`
 	Properties []string `yaml:"properties"`
 	Remove     []string `yaml:"remove"`
 }
 
-func (setting ContractMap) Valid() validation.ValidateResult {
+func (setting ContractMapSetting) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if len(setting.Id) <= 0 {

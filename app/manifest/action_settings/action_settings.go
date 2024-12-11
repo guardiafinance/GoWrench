@@ -3,13 +3,15 @@ package action_settings
 import (
 	"fmt"
 	"wrench/app/manifest/action_settings/http_settings"
+	"wrench/app/manifest/action_settings/trigger_settings"
 	"wrench/app/manifest/validation"
 )
 
 type ActionSettings struct {
-	Id   string                     `yaml:"id"`
-	Type ActionType                 `yaml:"type"`
-	Http *http_settings.HttpSetting `yaml:"http"`
+	Id      string                           `yaml:"id"`
+	Type    ActionType                       `yaml:"type"`
+	Http    *http_settings.HttpSetting       `yaml:"http"`
+	Trigger *trigger_settings.TriggerSetting `yaml:"trigger"`
 }
 
 type ActionType string
@@ -44,6 +46,10 @@ func (setting ActionSettings) Valid() validation.ValidateResult {
 
 	if setting.Type == ActionTypeHttpRequestMock {
 		setting.Http.ValidTypeActionTypeHttpRequestMock(&result)
+	}
+
+	if setting.Trigger != nil {
+		result.AppendValidable(setting.Trigger)
 	}
 
 	return result

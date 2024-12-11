@@ -2,11 +2,11 @@ package cross_cutting
 
 import (
 	"wrench/app/manifest/application_settings"
-	"wrench/app/manifest/contract/maps"
-	"wrench/app/manifest/token_credential"
+	"wrench/app/manifest/contract_settings/maps"
+	"wrench/app/manifest/token_credential_settings"
 )
 
-func GetContractById(contractId string) *maps.ContractMap {
+func GetContractById(contractId string) *maps.ContractMapSetting {
 	appSetting := application_settings.ApplicationSettingsStatic
 
 	if appSetting.Contract == nil {
@@ -18,7 +18,7 @@ func GetContractById(contractId string) *maps.ContractMap {
 		return nil
 	}
 
-	var contractMapSetting *maps.ContractMap = nil
+	var contractMapSetting *maps.ContractMapSetting = nil
 	for _, contractMap := range appSetting.Contract.Maps {
 		if contractMap.Id == contractId {
 			contractMapSetting = contractMap
@@ -29,7 +29,7 @@ func GetContractById(contractId string) *maps.ContractMap {
 	return contractMapSetting
 }
 
-func GetTokenCredentialById(tokenCredentialId string) *token_credential.TokenCredentialSetting {
+func GetTokenCredentialById(tokenCredentialId string) *token_credential_settings.TokenCredentialSetting {
 	appSetting := application_settings.ApplicationSettingsStatic
 
 	if appSetting.TokenCredentials == nil {
@@ -40,7 +40,7 @@ func GetTokenCredentialById(tokenCredentialId string) *token_credential.TokenCre
 		return nil
 	}
 
-	var tokenCredential *token_credential.TokenCredentialSetting = nil
+	var tokenCredential *token_credential_settings.TokenCredentialSetting = nil
 	for _, tokenCredentialSetting := range appSetting.TokenCredentials {
 		if tokenCredentialSetting.Id == tokenCredentialId {
 			tokenCredential = tokenCredentialSetting

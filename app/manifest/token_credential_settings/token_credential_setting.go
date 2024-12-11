@@ -1,4 +1,4 @@
-package token_credential
+package token_credential_settings
 
 import (
 	"fmt"

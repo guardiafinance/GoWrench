@@ -2,20 +2,30 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	contexts "wrench/app/contexts"
+	"wrench/app/json_map"
+	"wrench/app/manifest/contract_settings/maps"
 )
 
 type HttpContractMapHandler struct {
-	Next Handler
+	Next        Handler
+	ContractMap *maps.ContractMapSetting
 }
 
-func (httpFirst *HttpContractMapHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
+func (handler *HttpContractMapHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
-	if httpFirst.Next != nil {
-		httpFirst.Next.Do(ctx, wrenchContext, bodyContext)
+	if wrenchContext.HasError == false {
+		value, _ := json_map.GetValue(bodyContext.BodyArray, "name")
+
+		fmt.Print(value)
+	}
+
+	if handler.Next != nil {
+		handler.Next.Do(ctx, wrenchContext, bodyContext)
 	}
 }
 
-func (httpFirst *HttpContractMapHandler) SetNext(next Handler) {
-	httpFirst.Next = next
+func (handler *HttpContractMapHandler) SetNext(next Handler) {
+	handler.Next = next
 }

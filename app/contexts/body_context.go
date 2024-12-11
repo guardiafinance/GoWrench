@@ -2,6 +2,7 @@ package contexts
 
 type BodyContext struct {
 	Body           string
+	BodyArray      []byte
 	HttpStatusCode int
 	ContentType    string
 	Headers        map[string]string
