@@ -2,13 +2,13 @@ package json_map
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
+	"strings"
 )
 
 func GetValue(jsonValue []byte, propertyName string) (string, error) {
 	value := ""
 
+	var jsonMapCurrent map[string]interface{}
 	var jsonMap map[string]interface{}
 	jsonErr := json.Unmarshal(jsonValue, &jsonMap)
 
@@ -16,9 +16,22 @@ func GetValue(jsonValue []byte, propertyName string) (string, error) {
 		return "", jsonErr
 	}
 
-	value, ok := jsonMap[propertyName].(string)
-	if !ok {
-		return value, errors.New(fmt.Sprintf("Property %s not found", propertyName))
+	jsonMapCurrent = jsonMap
+
+	propertyNameSplitted := strings.Split(propertyName, ".")
+
+	for _, property := range propertyNameSplitted {
+		valueTemp, ok := jsonMapCurrent[property].(map[string]interface{})
+		if ok {
+			jsonMapCurrent = valueTemp
+			continue
+		}
+
+		valueTempString, ok := jsonMapCurrent[property].(string)
+		if ok {
+			value = valueTempString
+			break
+		}
 	}
 
 	return value, nil

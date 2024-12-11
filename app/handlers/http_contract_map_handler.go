@@ -17,8 +17,10 @@ func (handler *HttpContractMapHandler) Do(ctx context.Context, wrenchContext *co
 
 	if wrenchContext.HasError == false {
 		value, _ := json_map.GetValue(bodyContext.BodyArray, "name")
+		value2, _ := json_map.GetValue(bodyContext.BodyArray, "address.street")
 
 		fmt.Print(value)
+		fmt.Print(value2)
 	}
 
 	if handler.Next != nil {

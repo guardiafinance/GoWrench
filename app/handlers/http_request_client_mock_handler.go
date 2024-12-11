@@ -14,7 +14,7 @@ type HttpRequestClientMockHandler struct {
 func (httpRequestClientMockHandler *HttpRequestClientMockHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
 	if wrenchContext.HasError == false {
-		bodyContext.Body = httpRequestClientMockHandler.ActionSettings.Http.Mock.Body
+		bodyContext.BodyArray = []byte(httpRequestClientMockHandler.ActionSettings.Http.Mock.Body)
 		bodyContext.ContentType = httpRequestClientMockHandler.ActionSettings.Http.Mock.ContentType
 		bodyContext.HttpStatusCode = httpRequestClientMockHandler.ActionSettings.Http.Mock.StatusCode
 		bodyContext.Headers = httpRequestClientMockHandler.ActionSettings.Http.Mock.Headers
