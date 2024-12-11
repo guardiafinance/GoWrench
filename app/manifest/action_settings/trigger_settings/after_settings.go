@@ -1,4 +1,4 @@
-package do_settings
+package trigger_settings
 
 import (
 	"wrench/app/manifest/validation"

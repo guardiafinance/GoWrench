@@ -44,12 +44,11 @@ actions:
       request:
         method: get
         url: 'http://localhost:{{PORT}}/api/mock'
-        do:
+        trigger:
           before:
-            contractMapId: 
+            contractMapId: before_customer_create
           after:
-            contractMapId: 
-            
+            contractMapId: after_customer_create
         mapRequestHeaders:
           - "mock1"
           - "mock2:change2"
@@ -75,9 +74,11 @@ actions:
         
 contract:
   maps:
-  - id: customer_create
+  - id: before_customer_create
     properties: 
     - "name:name2"
     - "address.district:adress.district2"
+
+  - id: after_customer_create
     remove:
     - "observation"

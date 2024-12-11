@@ -1,15 +1,15 @@
-package do_settings
+package trigger_settings
 
 import (
 	"wrench/app/manifest/validation"
 )
 
-type DoSetting struct {
+type TriggerSetting struct {
 	Before *BeforeSetting `yaml:"before"`
 	After  *AfterSetting  `yaml:"after"`
 }
 
-func (setting DoSetting) Valid() validation.ValidateResult {
+func (setting TriggerSetting) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
 	if setting.After != nil {

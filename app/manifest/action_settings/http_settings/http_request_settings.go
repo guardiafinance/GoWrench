@@ -5,18 +5,18 @@ import (
 	"strings"
 
 	//"wrench/app/cross_cutting"
-	"wrench/app/manifest/action_settings/do_settings"
+	"wrench/app/manifest/action_settings/trigger_settings"
 	"wrench/app/manifest/types"
 	"wrench/app/manifest/validation"
 )
 
 type HttpRequestSetting struct {
-	Method            types.HttpMethod       `yaml:"method"`
-	Url               string                 `yaml:"url"`
-	MapFixedHeaders   map[string]string      `yaml:"mapFixedHeaders"`
-	MapRequestHeaders []string               `yaml:"mapRequestHeaders"`
-	TokenCredentialId string                 `yaml:"tokenCredentialId"`
-	Do                *do_settings.DoSetting `yaml:"do"`
+	Method            types.HttpMethod                 `yaml:"method"`
+	Url               string                           `yaml:"url"`
+	MapFixedHeaders   map[string]string                `yaml:"mapFixedHeaders"`
+	MapRequestHeaders []string                         `yaml:"mapRequestHeaders"`
+	TokenCredentialId string                           `yaml:"tokenCredentialId"`
+	Trigger           *trigger_settings.TriggerSetting `yaml:"trigger"`
 }
 
 func (setting HttpRequestSetting) Valid() validation.ValidateResult {
@@ -66,8 +66,8 @@ func (setting HttpRequestSetting) Valid() validation.ValidateResult {
 		}
 	}
 
-	if setting.Do != nil {
-		result.AppendValidable(setting.Do)
+	if setting.Trigger != nil {
+		result.AppendValidable(setting.Trigger)
 	}
 
 	// if len(setting.TokenCredentialId) > 0 {
