@@ -4,18 +4,18 @@ service:
   name: test-app
   version: 1.0.0
 
-tokenCredentials:
-  - id: auth_client
-    type: clientCredentials
-    authEndpoint: "{{KEYCLOCK_AUTH_ENDPOINT}}"
-    clientId: "{{KEYCLOCK_AUTH_CLIENT_ID}}"
-    clientSecret: "{{KEYCLOCK_AUTH_CLIENT_SECRET}}"
+# tokenCredentials:
+#   - id: auth_client
+#     type: clientCredentials
+#     authEndpoint: "{{KEYCLOCK_AUTH_ENDPOINT}}"
+#     clientId: "{{KEYCLOCK_AUTH_CLIENT_ID}}"
+#     clientSecret: "{{KEYCLOCK_AUTH_CLIENT_SECRET}}"
 
 api:
   endpoints:
     - route: /api/mock
-      method: get
-      actionId: get_customer_mock
+      method: post
+      actionId: post_customer_mock
 
     - route: /api/customer
       method: get
@@ -30,11 +30,12 @@ api:
       actionId: get_hello
 
 actions:
-  - id: get_customer_mock
+  - id: post_customer_mock
     type: httpRequestMock
     http:
       mock:
-        body: "{ 'Say':'Hello' }"
+        # body: "{ 'Say':'Hello', 'observation': 'Will work' }"
+        mirrorBody: true
         contentType: "application/json"
         statusCode: 201
         headers: 
@@ -46,7 +47,7 @@ actions:
     type: httpRequest
     http:
       request:
-        method: get
+        method: post
         url: 'http://localhost:{{PORT}}/api/mock'
         mapRequestHeaders:
           - "mock1"
@@ -71,7 +72,7 @@ actions:
         contractMapId: after_customer_create
     http:
       request:
-        method: get
+        method: post
         url: 'http://localhost:{{PORT}}/api/mock'
 
   - id: get_hello
@@ -79,14 +80,14 @@ actions:
     http:
       request:
         method: get
-        tokenCredentialId: auth_client
+        # tokenCredentialId: auth_client
         url: 'http://localhost:5250/hello'
 
         
 contract:
   maps:
   - id: before_customer_create
-    properties: 
+    properties:
     - "name:name2"
     - "address.district:adress.district2"
 
