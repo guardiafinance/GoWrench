@@ -90,7 +90,7 @@ contract:
     properties:
     - "name:name2"
     - "address.district:address.district2"
-
+    - "phoneNumber:phone.number"
   - id: after_customer_create
     remove:
     - "uncleName"

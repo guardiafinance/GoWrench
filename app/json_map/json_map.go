@@ -56,6 +56,12 @@ func CreateProperty(jsonValue []byte, propertyName string, value string) []byte 
 		valueTemp, ok := jsonMapCurrent[property].(map[string]interface{})
 		if ok {
 			jsonMapCurrent = valueTemp
+		} else {
+			if i+1 < total {
+				jsonMapNew := make(map[string]interface{})
+				jsonMapCurrent[property] = jsonMapNew
+				jsonMapCurrent = jsonMapNew
+			}
 		}
 
 		if i+1 == total {
