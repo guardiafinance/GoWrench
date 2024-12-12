@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func GetValue(jsonValue []byte, propertyName string, deleteProperty bool) string {
+func GetValue(jsonValue []byte, propertyName string, deleteProperty bool) (string, []byte) {
 	value := ""
 
 	var jsonMapCurrent map[string]interface{}
@@ -13,7 +13,7 @@ func GetValue(jsonValue []byte, propertyName string, deleteProperty bool) string
 	jsonErr := json.Unmarshal(jsonValue, &jsonMap)
 
 	if jsonErr != nil {
-		return ""
+		return "", jsonValue
 	}
 
 	jsonMapCurrent = jsonMap
@@ -38,7 +38,8 @@ func GetValue(jsonValue []byte, propertyName string, deleteProperty bool) string
 		}
 	}
 
-	return value
+	jsonArray, _ := json.Marshal(jsonMap)
+	return value, jsonArray
 }
 
 func CreateProperty(jsonValue []byte, propertyName string, value string) []byte {
@@ -62,7 +63,7 @@ func CreateProperty(jsonValue []byte, propertyName string, value string) []byte 
 		}
 	}
 
-	jsonArray, _ := json.Marshal(jsonMapCurrent)
+	jsonArray, _ := json.Marshal(jsonMap)
 	return jsonArray
 }
 
@@ -72,18 +73,18 @@ func RenameProperties(jsonValue []byte, properties []string) []byte {
 		propertyNameSplitted := strings.Split(property, ":")
 		propertyNameOld := propertyNameSplitted[0]
 		propertyNameNew := propertyNameSplitted[1]
-		jsonValueCurrent = RenameProperty(jsonValue, propertyNameOld, propertyNameNew)
+		jsonValueCurrent = RenameProperty(jsonValueCurrent, propertyNameOld, propertyNameNew)
 	}
 	return jsonValueCurrent
 }
 
 func ClonePropertyValue(jsonValue []byte, propertyNameSource string, propertyNameDestination string) []byte {
-	value := GetValue(jsonValue, propertyNameSource, false)
+	value, jsonValue := GetValue(jsonValue, propertyNameSource, false)
 	return CreateProperty(jsonValue, propertyNameDestination, value)
 }
 
 func RenameProperty(jsonValue []byte, propertyNameOld string, propertyNameNew string) []byte {
-	value := GetValue(jsonValue, propertyNameOld, true)
+	value, jsonValue := GetValue(jsonValue, propertyNameOld, true)
 	return CreateProperty(jsonValue, propertyNameNew, value)
 }
 
@@ -121,6 +122,6 @@ func RemoveProperty(jsonValue []byte, propertyName string) []byte {
 		}
 	}
 
-	jsonArray, _ := json.Marshal(jsonMapCurrent)
+	jsonArray, _ := json.Marshal(jsonMap)
 	return jsonArray
 }

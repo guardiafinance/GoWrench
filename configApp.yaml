@@ -89,8 +89,8 @@ contract:
   - id: before_customer_create
     properties:
     - "name:name2"
-    - "address.district:adress.district2"
+    - "address.district:address.district2"
 
   - id: after_customer_create
     remove:
-    - "observation"
+    - "uncleName"
