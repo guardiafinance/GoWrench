@@ -87,10 +87,18 @@ actions:
 contract:
   maps:
   - id: before_customer_create
-    properties:
+    # sequency:
+    # - rename
+    # - new
+    rename:
     - "name:name2"
     - "address.district:address.district2"
     - "phoneNumber:phone.number"
+    new:
+    - "id:{{uuid}}"
+    - "created:{{time 2006-02-01 15:04:05}}"
+    - "phone.type:mobile"
+    
   - id: after_customer_create
     remove:
     - "uncleName"

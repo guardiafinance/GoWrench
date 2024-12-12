@@ -3,6 +3,10 @@ package json_map
 import (
 	"encoding/json"
 	"strings"
+	"time"
+	"wrench/app/contexts"
+
+	"github.com/google/uuid"
 )
 
 func GetValue(jsonValue []byte, propertyName string, deleteProperty bool) (string, []byte) {
@@ -130,4 +134,44 @@ func RemoveProperty(jsonValue []byte, propertyName string) []byte {
 
 	jsonArray, _ := json.Marshal(jsonMap)
 	return jsonArray
+}
+
+func CreatePropertiesInterpolationValue(jsonValue []byte, propertiesValues []string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) []byte {
+	jsonValueCurrent := jsonValue
+	for _, propertyValue := range propertiesValues {
+		propertyValueSplitted := strings.Split(propertyValue, ":")
+		propertyName := propertyValueSplitted[0]
+		valueArray := propertyValueSplitted[1:]
+		value := strings.Join(valueArray, ":")
+		jsonValueCurrent = CreatePropertyInterpolationValue(jsonValueCurrent, propertyName, value, wrenchContext, bodyContext)
+	}
+	return jsonValueCurrent
+}
+
+func CreatePropertyInterpolationValue(jsonValue []byte, propertyName string, value string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) []byte {
+	valueResult := value
+
+	calculatedValue := func(value string) bool {
+		return strings.HasPrefix(value, "{{") && strings.HasSuffix(value, "}}")
+	}
+
+	if calculatedValue(value) {
+		rawValue := strings.ReplaceAll(strings.ReplaceAll(value, "{{", ""), "}}", "")
+
+		if rawValue == "uuid" {
+			valueResult = uuid.New().String()
+		} else if strings.HasPrefix(rawValue, "time") {
+			timeFormat := strings.ReplaceAll(rawValue, "time ", "")
+			timeNow := time.Now()
+
+			if len(timeFormat) > 0 {
+				valueResult = timeNow.Format(timeFormat)
+			} else {
+				valueResult = timeNow.String()
+			}
+		}
+
+	}
+
+	return CreateProperty(jsonValue, propertyName, valueResult)
 }
