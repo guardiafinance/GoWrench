@@ -87,17 +87,26 @@ actions:
 contract:
   maps:
   - id: before_customer_create
-    # sequency:
-    # - rename
-    # - new
+    sequence:
+    - new
+    - rename
+    - duplicate
+    - remove
+    duplicate:
+    - "newId:test.newId"
     rename:
     - "name:name2"
     - "address.district:address.district2"
     - "phoneNumber:phone.number"
+    - "document.value:documentNumber"
+    - "id:newId"
     new:
     - "id:{{uuid}}"
     - "created:{{time 2006-02-01 15:04:05}}"
     - "phone.type:mobile"
+    - "partnerKey:{{wrenchContext.request.headers.x-partner-key}}"
+    remove:
+    - "document"
     
   - id: after_customer_create
     remove:

@@ -88,7 +88,18 @@ func RenameProperties(jsonValue []byte, properties []string) []byte {
 	return jsonValueCurrent
 }
 
-func ClonePropertyValue(jsonValue []byte, propertyNameSource string, propertyNameDestination string) []byte {
+func DuplicatePropertiesValue(jsonValue []byte, properties []string) []byte {
+	jsonValueCurrent := jsonValue
+	for _, property := range properties {
+		propertyNameSplitted := strings.Split(property, ":")
+		propertyNameSource := propertyNameSplitted[0]
+		propertyNameDestination := propertyNameSplitted[1]
+		jsonValueCurrent = DuplicatePropertyValue(jsonValueCurrent, propertyNameSource, propertyNameDestination)
+	}
+	return jsonValueCurrent
+}
+
+func DuplicatePropertyValue(jsonValue []byte, propertyNameSource string, propertyNameDestination string) []byte {
 	value, jsonValue := GetValue(jsonValue, propertyNameSource, false)
 	return CreateProperty(jsonValue, propertyNameDestination, value)
 }
@@ -123,7 +134,11 @@ func RemoveProperty(jsonValue []byte, propertyName string) []byte {
 
 	for i, property := range propertyNameSplitted {
 		valueTemp, ok := jsonMapCurrent[property].(map[string]interface{})
-		if ok {
+
+		if ok && i+1 == total {
+			delete(jsonMapCurrent, property)
+			break
+		} else {
 			jsonMapCurrent = valueTemp
 		}
 
@@ -169,9 +184,23 @@ func CreatePropertyInterpolationValue(jsonValue []byte, propertyName string, val
 			} else {
 				valueResult = timeNow.String()
 			}
+		} else if strings.HasPrefix(rawValue, "wrenchContext") {
+			valueResult = getValueWrenchContext(rawValue, wrenchContext)
 		}
 
 	}
 
 	return CreateProperty(jsonValue, propertyName, valueResult)
+}
+
+const wrenchContextRequestHeaders = "wrenchContext.request.headers."
+
+func getValueWrenchContext(command string, wrenchContext *contexts.WrenchContext) string {
+
+	if strings.HasPrefix(command, wrenchContextRequestHeaders) {
+		headerName := strings.ReplaceAll(command, wrenchContextRequestHeaders, "")
+		return wrenchContext.Request.Header.Get(headerName)
+	}
+
+	return ""
 }
