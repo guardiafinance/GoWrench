@@ -116,7 +116,7 @@ func RemoveProperties(jsonValue []byte, propertiesName []string) []byte {
 
 	currentJsonValue := jsonValue
 	for _, property := range propertiesName {
-		currentJsonValue = RemoveProperty(jsonValue, property)
+		currentJsonValue = RemoveProperty(currentJsonValue, property)
 	}
 
 	return currentJsonValue
