@@ -1,9 +1,10 @@
 name: Build and Push Docker Image with Git Tag
 
-on:
+on: 
   push:
-    tags:
-      - 'v*'
+    branches:
+      - "main"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,26 +17,23 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.23'
+  
+  build-and-publish-docker:
+    needs: build
+    name: 'build and publish docker'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    - name: Extract Git tag version
-      id: extract_tag
-      run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
-
-    - name: Build the Docker image
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/gowrench:${{ steps.extract_tag.outputs.tag }} .
-
-    - name: Push the Docker image
-      run: |
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/gowrench:${{ steps.extract_tag.outputs.tag }}
-
-    - name: Tag the image as latest
-      run: |
-        docker tag ${{ secrets.DOCKERHUB_USERNAME }}/gowrench:${{ steps.extract_tag.outputs.tag }} ${{ secrets.DOCKERHUB_USERNAME }}/gowrench:latest
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/gowrench:latest
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ivanmds2/wrenchgo:latest, ivanmds2/wrenchgo:${{ github.run_number }}
+    
