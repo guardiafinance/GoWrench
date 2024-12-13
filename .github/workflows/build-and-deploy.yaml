@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "main"
-      
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,7 +34,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./Wrench/App
           push: true
           tags: ivanmds2/wrenchgo:latest, ivanmds2/wrenchgo:${{ github.run_number }}
     
