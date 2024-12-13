@@ -15,4 +15,4 @@ COPY --from=builder /app/main /main
 
 EXPOSE 8080
 
-ENTRYPOINT ["app/cmd/main"]
+ENTRYPOINT ["./app/cmd/main"]
