@@ -40,6 +40,10 @@ func (handler *HttpContractMapHandler) Do(ctx context.Context, wrenchContext *co
 			if handler.ContractMap.Remove != nil {
 				currentBodyContext = json_map.RemoveProperties(currentBodyContext, handler.ContractMap.Remove)
 			}
+
+			if handler.ContractMap.Parse != nil {
+				currentBodyContext = json_map.ParseValues(currentBodyContext, handler.ContractMap.Parse)
+			}
 		}
 
 		bodyContext.BodyArray = currentBodyContext
@@ -66,6 +70,8 @@ func (handler *HttpContractMapHandler) doSequency(wrenchContext *contexts.Wrench
 			currentBodyContext = json_map.RemoveProperties(currentBodyContext, handler.ContractMap.Remove)
 		} else if action == "duplicate" {
 			currentBodyContext = json_map.DuplicatePropertiesValue(currentBodyContext, handler.ContractMap.Duplicate)
+		} else if action == "parse" {
+			currentBodyContext = json_map.ParseValues(currentBodyContext, handler.ContractMap.Parse)
 		}
 	}
 

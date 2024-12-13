@@ -7,15 +7,16 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-var funcValids = []string{"rename", "new", "remove", "duplicate"}
+var funcValids = []string{"rename", "new", "remove", "duplicate", "parse"}
 
 type ContractMapSetting struct {
-	Id        string   `yaml:"id"`
-	Rename    []string `yaml:"rename"`
-	Remove    []string `yaml:"remove"`
-	Sequence  []string `yaml:"sequence"`
-	New       []string `yaml:"new"`
-	Duplicate []string `yaml:"duplicate"`
+	Id        string         `yaml:"id"`
+	Rename    []string       `yaml:"rename"`
+	Remove    []string       `yaml:"remove"`
+	Sequence  []string       `yaml:"sequence"`
+	New       []string       `yaml:"new"`
+	Duplicate []string       `yaml:"duplicate"`
+	Parse     *ParseSettings `yaml:"parse"`
 }
 
 func (setting ContractMapSetting) Valid() validation.ValidateResult {
@@ -72,6 +73,11 @@ func (setting ContractMapSetting) Valid() validation.ValidateResult {
 		totalMapConfigured++
 	}
 
+	if setting.Parse != nil {
+		totalMapConfigured++
+		result.AppendValidable(setting.Parse)
+	}
+
 	if len(setting.Sequence) > 0 {
 
 		if totalMapConfigured != len(setting.Sequence) {
@@ -89,6 +95,8 @@ func (setting ContractMapSetting) Valid() validation.ValidateResult {
 				result.AddError("contract.maps.new rename not configured")
 			} else if s == "remove" && setting.Remove == nil {
 				result.AddError("contract.maps.sequence remove not configured")
+			} else if s == "parse" && setting.Parse == nil {
+				result.AddError("contract.maps.sequence parse not configured")
 			}
 		}
 	}
