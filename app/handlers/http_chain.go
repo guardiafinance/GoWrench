@@ -30,18 +30,38 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 			log.Fatal(err)
 		}
 
+		if action.Trigger != nil && action.Trigger.Before != nil {
+			httpContractMapHandler := new(HttpContractMapHandler)
+
+			contractMapId := action.Trigger.Before.ContractMapId
+			httpContractMapHandler.ContractMap = settings.Contract.GetContractById(contractMapId)
+
+			currentHandler.SetNext(httpContractMapHandler)
+			currentHandler = httpContractMapHandler
+		}
+
 		if action.Type == action_settings.ActionTypeHttpRequest {
-			var httpRequestHadler = new(HttpRequestClientHandler)
+			httpRequestHadler := new(HttpRequestClientHandler)
 			httpRequestHadler.ActionSettings = action
 			currentHandler.SetNext(httpRequestHadler)
 			currentHandler = httpRequestHadler
 		}
 
 		if action.Type == action_settings.ActionTypeHttpRequestMock {
-			var httpRequestMockHadler = new(HttpRequestClientMockHandler)
+			httpRequestMockHadler := new(HttpRequestClientMockHandler)
 			httpRequestMockHadler.ActionSettings = action
 			currentHandler.SetNext(httpRequestMockHadler)
 			currentHandler = httpRequestMockHadler
+		}
+
+		if action.Trigger != nil && action.Trigger.After != nil {
+			httpContractMapHandler := new(HttpContractMapHandler)
+
+			contractMapId := action.Trigger.After.ContractMapId
+			httpContractMapHandler.ContractMap = settings.Contract.GetContractById(contractMapId)
+
+			currentHandler.SetNext(httpContractMapHandler)
+			currentHandler = httpContractMapHandler
 		}
 
 		currentHandler.SetNext(new(HttpLastHandler))

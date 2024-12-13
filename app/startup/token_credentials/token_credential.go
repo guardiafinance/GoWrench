@@ -9,7 +9,7 @@ import (
 	"time"
 	client "wrench/app/clients/http"
 	"wrench/app/manifest/application_settings"
-	credential "wrench/app/manifest/token_credential"
+	credential "wrench/app/manifest/token_credential_settings"
 )
 
 var tokenCredentials map[string]*JwtData

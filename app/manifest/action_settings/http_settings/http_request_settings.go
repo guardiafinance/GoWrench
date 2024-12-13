@@ -3,6 +3,8 @@ package http_settings
 import (
 	"fmt"
 	"strings"
+
+	//"wrench/app/cross_cutting"
 	"wrench/app/manifest/types"
 	"wrench/app/manifest/validation"
 )
@@ -62,28 +64,11 @@ func (setting HttpRequestSetting) Valid() validation.ValidateResult {
 		}
 	}
 
-	// TODO to validate the TokenCredentialId is causing "import cycle not allowed", this I will see later
 	// if len(setting.TokenCredentialId) > 0 {
-	// 	appSetting := application_settings.ApplicationSettingsStatic
-	// 	credentials := appSetting.TokenCredentials
+	// 	tokenCredential := cross_cutting.GetTokenCredentialById(setting.TokenCredentialId)
 
-	// 	if credentials == nil {
+	// 	if tokenCredential == nil {
 	// 		result.AddError(fmt.Sprintf("actions.http.request.tokenCredentialId %v don't exist in tokenCredentials", setting.TokenCredentialId))
-	// 	} else {
-	// 		var hasTokenCredentialId bool = false
-	// 		for _, credential := range credentials {
-	// 			if setting.TokenCredentialId == credential.Id {
-	// 				hasTokenCredentialId = true
-	// 			}
-
-	// 			if hasTokenCredentialId {
-	// 				break
-	// 			}
-	// 		}
-
-	// 		if hasTokenCredentialId == false {
-	// 			result.AddError(fmt.Sprintf("actions.http.request.tokenCredentialId %v don't exist in tokenCredentials", setting.TokenCredentialId))
-	// 		}
 	// 	}
 	// }
 

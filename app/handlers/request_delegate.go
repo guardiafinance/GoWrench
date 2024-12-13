@@ -15,8 +15,6 @@ type RequestDelegate struct {
 
 func (request *RequestDelegate) FirstHttp(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-
-	httpFirstHandler := new(HttpFirstHandler)
 	requestURI := r.RequestURI
 	appSetting := appSetting.ApplicationSettingsStatic
 
@@ -31,8 +29,8 @@ func (request *RequestDelegate) FirstHttp(w http.ResponseWriter, r *http.Request
 	bodyContext := new(contexts.BodyContext)
 	wrenchContext := new(contexts.WrenchContext)
 	wrenchContext.ResponseWriter = &w
-	httpFirstHandler.SetNext(handler)
-	httpFirstHandler.Do(ctx, wrenchContext, bodyContext)
+	wrenchContext.Request = r
+	handler.Do(ctx, wrenchContext, bodyContext)
 }
 
 func (request *RequestDelegate) SetEndpoint(endpoint *settings.EndpointSettings) {

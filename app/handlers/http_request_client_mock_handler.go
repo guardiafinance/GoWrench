@@ -11,20 +11,22 @@ type HttpRequestClientMockHandler struct {
 	ActionSettings *settings.ActionSettings
 }
 
-func (httpRequestClientMockHandler *HttpRequestClientMockHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
+func (handler *HttpRequestClientMockHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
 	if wrenchContext.HasError == false {
-		bodyContext.Body = httpRequestClientMockHandler.ActionSettings.Http.Mock.Body
-		bodyContext.ContentType = httpRequestClientMockHandler.ActionSettings.Http.Mock.ContentType
-		bodyContext.HttpStatusCode = httpRequestClientMockHandler.ActionSettings.Http.Mock.StatusCode
-		bodyContext.Headers = httpRequestClientMockHandler.ActionSettings.Http.Mock.Headers
+		if handler.ActionSettings.Http.Mock.MirrorBody == false {
+			bodyContext.BodyArray = []byte(handler.ActionSettings.Http.Mock.Body)
+		}
+		bodyContext.ContentType = handler.ActionSettings.Http.Mock.ContentType
+		bodyContext.HttpStatusCode = handler.ActionSettings.Http.Mock.StatusCode
+		bodyContext.Headers = handler.ActionSettings.Http.Mock.Headers
 	}
 
-	if httpRequestClientMockHandler.Next != nil {
-		httpRequestClientMockHandler.Next.Do(ctx, wrenchContext, bodyContext)
+	if handler.Next != nil {
+		handler.Next.Do(ctx, wrenchContext, bodyContext)
 	}
 }
 
-func (httpRequestClientMockHandler *HttpRequestClientMockHandler) SetNext(handler Handler) {
-	httpRequestClientMockHandler.Next = handler
+func (handlerMock *HttpRequestClientMockHandler) SetNext(handler Handler) {
+	handlerMock.Next = handler
 }

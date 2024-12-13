@@ -4,8 +4,9 @@ import (
 	"errors"
 	"wrench/app/manifest/action_settings"
 	"wrench/app/manifest/api_settings"
+	"wrench/app/manifest/contract_settings"
 	"wrench/app/manifest/service_settings"
-	credential "wrench/app/manifest/token_credential"
+	credential "wrench/app/manifest/token_credential_settings"
 	"wrench/app/manifest/validation"
 )
 
@@ -16,6 +17,7 @@ type ApplicationSettings struct {
 	Actions          []action_settings.ActionSettings     `yaml:"actions"`
 	Service          *service_settings.ServiceSettings    `yaml:"service"`
 	TokenCredentials []*credential.TokenCredentialSetting `yaml:"tokenCredentials"`
+	Contract         *contract_settings.ContractSetting   `yaml:"contract"`
 }
 
 func (settings ApplicationSettings) GetActionById(actionId string) (*action_settings.ActionSettings, error) {
@@ -49,6 +51,10 @@ func (settings ApplicationSettings) Valid() validation.ValidateResult {
 		for _, validable := range settings.TokenCredentials {
 			result.AppendValidable(validable)
 		}
+	}
+
+	if settings.Contract != nil {
+		result.AppendValidable(settings.Contract)
 	}
 
 	return result
