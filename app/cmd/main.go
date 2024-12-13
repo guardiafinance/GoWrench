@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
 	"wrench/app/startup"
@@ -14,6 +15,8 @@ import (
 )
 
 func main() {
+	loadBashFiles()
+
 	startup.LoadEnvsFiles()
 
 	byteArray, err := startup.LoadYamlFile(getFileConfigPath())
@@ -40,6 +43,37 @@ func main() {
 		var router = startup.LoadApplicationSettings(applicationSetting)
 		port := getPort()
 		http.ListenAndServe(port, router)
+	}
+}
+
+func loadBashFiles() {
+	startup.LoadEnvsFiles()
+
+	byteArray, err := startup.LoadYamlFile(getFileConfigPath())
+	if err != nil {
+		log.Fatalf("Error loading YAML: %v", err)
+	}
+	byteArray = startup.EnvInterpolation(byteArray)
+
+	applicationSetting, err := parseToApplicationSetting(byteArray)
+	if applicationSetting.Trigger != nil && applicationSetting.Trigger.BeforeStartup != nil {
+		bashRun(applicationSetting.Trigger.BeforeStartup.PathBashFiles)
+	}
+}
+
+func bashRun(paths []string) {
+	for _, path := range paths {
+
+		cmd := exec.Command("bash", path)
+
+		// Run the command and capture the output
+		output, err := cmd.Output()
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		} else {
+			fmt.Print(output)
+		}
 	}
 }
 
