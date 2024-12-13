@@ -3,6 +3,7 @@ package client_http
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,16 +11,33 @@ import (
 )
 
 var httpClient *http.Client = new(http.Client)
+var httpClientInsecure *http.Client
 
 func GetHttpClientStatic() *http.Client {
 	return httpClient
 }
 
+func GetHttpClientInsecureStatic() *http.Client {
+
+	if httpClientInsecure == nil {
+		httpClientInsecure = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			},
+		}
+	}
+
+	return httpClientInsecure
+}
+
 type HttpClientRequestData struct {
-	Url     string
-	Method  string
-	Body    []byte
-	Headers map[string]string
+	Url      string
+	Method   string
+	Body     []byte
+	Headers  map[string]string
+	Insecure bool
 }
 
 type HttpClientResponseData struct {
@@ -60,7 +78,14 @@ func (httpClientRequestData *HttpClientRequestData) SetHeader(key string, value 
 }
 
 func HttpClientDo(ctx context.Context, request *HttpClientRequestData) (*HttpClientResponseData, error) {
-	client := GetHttpClientStatic()
+	var client *http.Client
+
+	if request.Insecure == false {
+		client = GetHttpClientStatic()
+	} else {
+		client = GetHttpClientInsecureStatic()
+	}
+
 	method := strings.ToUpper(request.Method)
 	var body io.Reader = nil
 

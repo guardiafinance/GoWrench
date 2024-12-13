@@ -15,6 +15,7 @@ type HttpRequestSetting struct {
 	MapFixedHeaders   map[string]string `yaml:"mapFixedHeaders"`
 	MapRequestHeaders []string          `yaml:"mapRequestHeaders"`
 	TokenCredentialId string            `yaml:"tokenCredentialId"`
+	Insecure          bool              `yaml:"insecure"`
 }
 
 func (setting HttpRequestSetting) Valid() validation.ValidateResult {

@@ -23,6 +23,7 @@ func (handler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *
 		request.Body = bodyContext.BodyArray
 		request.Method = string(handler.ActionSettings.Http.Request.Method)
 		request.Url = handler.ActionSettings.Http.Request.Url
+		request.Insecure = handler.ActionSettings.Http.Request.Insecure
 		request.SetHeaders(handler.ActionSettings.Http.Request.MapFixedHeaders)
 		request.SetHeaders(mapHttpRequestHeaders(wrenchContext, handler.ActionSettings.Http.Request.MapRequestHeaders))
 
