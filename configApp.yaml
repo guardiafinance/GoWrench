@@ -100,6 +100,7 @@ contract:
     - new
     - rename
     - duplicate
+    - parse
     - remove
     duplicate:
     - "newId:test.newId"
@@ -116,6 +117,9 @@ contract:
     - "partnerKey:{{wrenchContext.request.headers.x-partner-key}}"
     remove:
     - "document"
+    parse:
+      whenEquals:
+        - "{{bodyContext.address.type.Mobile:Movel}}"
     
   - id: after_customer_create
     remove:

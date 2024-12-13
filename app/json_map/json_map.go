@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 	"wrench/app/contexts"
+	"wrench/app/manifest/contract_settings/maps"
 
 	"github.com/google/uuid"
 )
@@ -44,6 +45,36 @@ func GetValue(jsonValue []byte, propertyName string, deleteProperty bool) (strin
 
 	jsonArray, _ := json.Marshal(jsonMap)
 	return value, jsonArray
+}
+
+func SetValue(jsonValue []byte, propertyName string, newValue string) []byte {
+
+	var jsonMapCurrent map[string]interface{}
+	var jsonMap map[string]interface{}
+	jsonErr := json.Unmarshal(jsonValue, &jsonMap)
+
+	if jsonErr != nil {
+		return jsonValue
+	}
+
+	jsonMapCurrent = jsonMap
+	propertyNameSplitted := strings.Split(propertyName, ".")
+	total := len(propertyNameSplitted)
+
+	for i, property := range propertyNameSplitted {
+		valueTemp, ok := jsonMapCurrent[property].(map[string]interface{})
+		if ok {
+			jsonMapCurrent = valueTemp
+			continue
+		}
+
+		if i+1 == total {
+			jsonMapCurrent[property] = newValue
+		}
+	}
+
+	jsonArray, _ := json.Marshal(jsonMap)
+	return jsonArray
 }
 
 func CreateProperty(jsonValue []byte, propertyName string, value string) []byte {
@@ -163,15 +194,19 @@ func CreatePropertiesInterpolationValue(jsonValue []byte, propertiesValues []str
 	return jsonValueCurrent
 }
 
+func calculatedValue(value string) bool {
+	return strings.HasPrefix(value, "{{") && strings.HasSuffix(value, "}}")
+}
+
+func replaceCalculatedValue(command string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(command, "{{", ""), "}}", "")
+}
+
 func CreatePropertyInterpolationValue(jsonValue []byte, propertyName string, value string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) []byte {
 	valueResult := value
 
-	calculatedValue := func(value string) bool {
-		return strings.HasPrefix(value, "{{") && strings.HasSuffix(value, "}}")
-	}
-
 	if calculatedValue(value) {
-		rawValue := strings.ReplaceAll(strings.ReplaceAll(value, "{{", ""), "}}", "")
+		rawValue := replaceCalculatedValue(value)
 
 		if rawValue == "uuid" {
 			valueResult = uuid.New().String()
@@ -203,4 +238,39 @@ func getValueWrenchContext(command string, wrenchContext *contexts.WrenchContext
 	}
 
 	return ""
+}
+
+const bodyContext = "bodyContext."
+
+func ParseValues(jsonValue []byte, parse *maps.ParseSettings) []byte {
+	jsonValueCurrent := jsonValue
+	if parse.WhenEquals != nil {
+		for _, whenEqual := range parse.WhenEquals {
+			if calculatedValue(whenEqual) {
+				whenEqual = strings.ReplaceAll(whenEqual, bodyContext, "")
+				rawWhenEqual := replaceCalculatedValue(whenEqual)
+
+				whenEqualSplitted := strings.Split(rawWhenEqual, ":")
+				propertyNameWithEqualValue := whenEqualSplitted[0]
+				propertyNameWithEqualValueSplitted := strings.Split(propertyNameWithEqualValue, ".")
+
+				lenWithEqual := len(propertyNameWithEqualValueSplitted)
+
+				valueArray := propertyNameWithEqualValueSplitted[:lenWithEqual-1]
+
+				propertyName := strings.Join(valueArray, ".")
+				equalValue := propertyNameWithEqualValueSplitted[lenWithEqual-1] // value to compare
+
+				parseToValue := whenEqualSplitted[1] // value if equals should be used
+
+				valueCurrent, _ := GetValue(jsonValue, propertyName, false)
+
+				if valueCurrent == equalValue {
+					jsonValueCurrent = SetValue(jsonValueCurrent, propertyName, parseToValue)
+				}
+			}
+		}
+	}
+
+	return jsonValueCurrent
 }
