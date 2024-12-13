@@ -1,9 +1,11 @@
 package startup
 
 import (
+	"net/http"
 	"strings"
 	handler "wrench/app/handlers"
 	settings "wrench/app/manifest/api_settings"
+	"wrench/app/manifest/application_settings"
 
 	"github.com/gorilla/mux"
 )
@@ -24,4 +26,13 @@ func LoadApiEndpoint(endpoints []settings.EndpointSettings) *mux.Router {
 
 	r.HandleFunc("/", initialPage.WriteInitialPage).Methods("GET")
 	return r
+}
+
+func LoadEndpointHc(w http.ResponseWriter, r *http.Request) {
+	app := application_settings.ApplicationSettingsStatic
+	validationResult := app.Valid()
+
+	if len(validationResult.GetErrors()) > 0 {
+
+	}
 }

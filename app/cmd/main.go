@@ -31,19 +31,12 @@ func main() {
 	}
 
 	application_settings.ApplicationSettingsStatic = applicationSetting
-	var result = applicationSetting.Valid()
+	//var result = applicationSetting.Valid()
 
-	if result.HasError() == true {
-		var errors = result.GetError()
-		for _, error := range errors {
-			fmt.Println(error)
-		}
-	} else {
-		go token_credentials.LoadTokenCredentialAuthentication()
-		var router = startup.LoadApplicationSettings(applicationSetting)
-		port := getPort()
-		http.ListenAndServe(port, router)
-	}
+	go token_credentials.LoadTokenCredentialAuthentication()
+	var router = startup.LoadApplicationSettings(applicationSetting)
+	port := getPort()
+	http.ListenAndServe(port, router)
 }
 
 func loadBashFiles() {

@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  whrench:
+    build: .
+    environment:
+     - PATH_FILE_CONFIG="configApp.yaml"
