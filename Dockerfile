@@ -1,18 +1,14 @@
-FROM golang:1.23 AS builder
+FROM golang:1.23-alpine AS build
 WORKDIR /app
 
-COPY go.mod go.sum app ./ 
+COPY go.mod go.sum ./
+RUN go mod download
 
 COPY . .
-
-RUN go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -o whrenchapp ./app/cmd
+#####
 
 FROM scratch
+COPY --from=build /app/whrenchapp /
 
-COPY --from=builder /app/configApp.yaml /configApp.yaml
-
-COPY --from=builder /app/main /main
-
-EXPOSE 8080
-
-ENTRYPOINT ["./app/cmd/main"]
+ENTRYPOINT [ "/whrenchapp" ]
