@@ -42,11 +42,20 @@ actions:
           "mock1": "value1"
           "mock2": "value2"
           "mock3": "value2"
+  
+  - id: cerc_register_participant
+    type: httpRequest
+    http:
+      request:
+        insecure: true
+        method: put
+        url: 'https://webhook.site/e08a967f-59ba-463a-8fe2-cf173b493f34'
 
   - id: get_customer
     type: httpRequest
     http:
       request:
+        #insecure: true
         method: post
         url: 'http://localhost:{{PORT}}/api/mock'
         mapRequestHeaders:
