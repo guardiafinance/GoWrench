@@ -1,7 +1,12 @@
 version: 1
 
+trigger:
+  beforeStartup: 
+    pathBashFiles: 
+    - "../../beforeStratup.sh"
+
 service:
-  name: test-app
+  name: "{{SERVICE_NAME}}"
   version: 1.0.0
 
 # tokenCredentials:
