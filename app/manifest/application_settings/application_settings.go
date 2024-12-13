@@ -18,6 +18,7 @@ type ApplicationSettings struct {
 	Service          *service_settings.ServiceSettings    `yaml:"service"`
 	TokenCredentials []*credential.TokenCredentialSetting `yaml:"tokenCredentials"`
 	Contract         *contract_settings.ContractSetting   `yaml:"contract"`
+	Trigger          *TriggerSettings                     `yaml:"trigger"`
 }
 
 func (settings ApplicationSettings) GetActionById(actionId string) (*action_settings.ActionSettings, error) {
@@ -55,6 +56,10 @@ func (settings ApplicationSettings) Valid() validation.ValidateResult {
 
 	if settings.Contract != nil {
 		result.AppendValidable(settings.Contract)
+	}
+
+	if settings.Trigger != nil {
+		result.AppendValidable(settings.Trigger)
 	}
 
 	return result
