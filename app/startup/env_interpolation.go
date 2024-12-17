@@ -13,14 +13,14 @@ func LoadEnvsFiles() {
 	envFolder := os.Getenv(app.ENV_PATH_FOLDER_ENV_FILES)
 
 	if len(envFolder) == 0 {
-		envFolder = "../.."
+		envFolder = "./"
 	}
 
-	envPath := fmt.Sprintf("%s/.ENV", envFolder)
+	envPath := fmt.Sprintf("%s.ENV", envFolder)
 	setEnvFileToSystemEnv(envPath)
 
 	envValue := os.Getenv(app.ENV_APP_ENV)
-	envPathEnvironment := fmt.Sprintf("%s/.ENV.%s", envFolder, envValue)
+	envPathEnvironment := fmt.Sprintf("%s.ENV.%s", envFolder, envValue)
 	setEnvFileToSystemEnv(envPathEnvironment)
 }
 
@@ -48,6 +48,7 @@ func setEnvFileToSystemEnv(pathEnvFile string) {
 
 	if err != nil {
 		if os.IsNotExist(err) {
+			log.Print(fmt.Sprintf("Env file %s not found ", pathEnvFile))
 			return
 		} else {
 			log.Fatal(err)
@@ -55,6 +56,7 @@ func setEnvFileToSystemEnv(pathEnvFile string) {
 	}
 	r := bufio.NewReader(file)
 
+	log.Print(fmt.Sprintf("Loading file %s", pathEnvFile))
 	for {
 		line, _, err := r.ReadLine()
 		if err != nil && fmt.Sprint(err) != "EOF" {
@@ -76,4 +78,5 @@ func setEnvFileToSystemEnv(pathEnvFile string) {
 			break
 		}
 	}
+	log.Print(fmt.Sprintf("Done file %s", pathEnvFile))
 }

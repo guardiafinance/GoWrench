@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
 	"wrench/app/startup"
@@ -31,41 +32,42 @@ func main() {
 	}
 
 	application_settings.ApplicationSettingsStatic = applicationSetting
-	//var result = applicationSetting.Valid()
 
 	go token_credentials.LoadTokenCredentialAuthentication()
 	var router = startup.LoadApplicationSettings(applicationSetting)
 	port := getPort()
+	log.Print(fmt.Sprintf("Server listen in port %s", port))
 	http.ListenAndServe(port, router)
 }
 
 func loadBashFiles() {
-	startup.LoadEnvsFiles()
+	envbashFiles := os.Getenv(app.ENV_PATH_FOLDER_ENV_FILES)
 
-	byteArray, err := startup.LoadYamlFile(getFileConfigPath())
-	if err != nil {
-		log.Fatalf("Error loading YAML: %v", err)
+	if len(envbashFiles) == 0 {
+		envbashFiles = "wrench/bash/startup.sh"
 	}
-	byteArray = startup.EnvInterpolation(byteArray)
 
-	applicationSetting, err := parseToApplicationSetting(byteArray)
-	if applicationSetting.Trigger != nil && applicationSetting.Trigger.BeforeStartup != nil {
-		bashRun(applicationSetting.Trigger.BeforeStartup.PathBashFiles)
-	}
+	bashFiles := strings.Split(envbashFiles, ",")
+	bashRun(bashFiles)
 }
 
 func bashRun(paths []string) {
 	for _, path := range paths {
+		path = strings.TrimSpace(path)
+		if _, err := os.Stat(path); err != nil {
+			log.Print(fmt.Sprintf("file bash %s not found", path))
+			continue
+		}
 
-		cmd := exec.Command("bash", path)
+		log.Print(fmt.Sprintf("Will process file bash %s", path))
+		cmd := exec.Command("/bin/sh", "./"+path)
 
-		// Run the command and capture the output
 		output, err := cmd.Output()
 		if err != nil {
-			fmt.Println("Error:", err)
+			log.Print("Error: ", err)
 			return
 		} else {
-			fmt.Print(output)
+			log.Print(output)
 		}
 	}
 }

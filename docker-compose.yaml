@@ -1,7 +1,13 @@
-version: "3"
+version: '3.8'
 
 services:
   whrench:
     build: .
+    ports:
+    - 9092:9092
     environment:
-     - PATH_FILE_CONFIG="configApp.yaml"
+    - PATH_FILE_CONFIG=/configApp.yaml
+    volumes:
+    - ./configApp.yaml:/configApp.yaml
+    - ./startup.sh:/wrench/bash/startup.sh
+    - ./.ENV:/.ENV

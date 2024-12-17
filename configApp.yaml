@@ -1,10 +1,5 @@
 version: 1
 
-trigger:
-  beforeStartup: 
-    pathBashFiles: 
-    - "../../beforeStratup.sh"
-
 service:
   name: "{{SERVICE_NAME}}"
   version: 1.0.0
@@ -30,7 +25,7 @@ api:
       method: post
       actionId: post_customer
       
-    - route: /api/hello
+    - route: /api/hellos
       method: get
       actionId: get_hello
 

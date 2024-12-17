@@ -42,7 +42,7 @@ func (setting EndpointSettings) Valid() validation.ValidateResult {
 	}
 
 	if len(setting.ActionID) == 0 && len(setting.FlowActionID) == 0 {
-		var msg = fmt.Sprintf("Should be informed an api.endpoints[%s].actionId or api.endpoints[%s].flowActionId", setting.ActionID, setting.ActionID)
+		var msg = fmt.Sprintf("Should be informed an api.endpoints[%s].actionId or api.endpoints[%s].flowActionId", setting.Route, setting.ActionID)
 		result.AddError(msg)
 	}
 	return result
