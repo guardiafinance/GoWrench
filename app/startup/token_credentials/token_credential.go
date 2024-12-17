@@ -2,6 +2,7 @@ package token_credentials
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,17 +36,27 @@ func LoadTokenCredentialAuthentication() {
 
 				jwtData := GetTokenCredentialById(setting.Id)
 				if jwtData != nil {
-					if jwtData.IsExpired(5) == false {
+					if jwtData.IsExpired(5, setting.IsOpaque) == false {
 						continue
 					}
 				}
 
-				jwtData, err := authenticateClientCredentials(setting)
+				var err error
+				if setting.Type == credential.TokenCredentialClientCredential {
+					jwtData, err = authenticateClientCredentials(setting)
+				} else {
+					jwtData, err = basicCredentials(setting)
+				}
+
 				if err != nil {
 					continue
 					// TODO setting error to unhealthy api
 				}
-				jwtData.LoadJwtPayload()
+
+				if setting.IsOpaque == false {
+					jwtData.LoadJwtPayload()
+				}
+
 				tokenCredentials[setting.Id] = jwtData
 			}
 
@@ -57,8 +68,8 @@ func LoadTokenCredentialAuthentication() {
 func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (*JwtData, error) {
 	request := new(client.HttpClientRequestData)
 	data := url.Values{}
-	data.Set("client_id", setting.ClientId)
-	data.Set("client_secret", setting.ClientSecret)
+	data.Set("client_id", setting.ClientCredential.ClientId)
+	data.Set("client_secret", setting.ClientCredential.ClientSecret)
 	data.Set("grant_type", "client_credentials")
 
 	request.Body = []byte(data.Encode())
@@ -66,6 +77,47 @@ func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (
 	request.Url = setting.AuthEndpoint
 
 	request.SetHeader("Content-Type", "application/x-www-form-urlencoded")
+	ctx := context.Background()
+
+	response, err := client.HttpClientDo(ctx, request)
+
+	if err != nil {
+		// TODO add error flow
+		return nil, err
+	} else {
+
+		if response.StatusCodeSuccess() {
+			token := string(response.Body)
+			tokenArray := []byte(token)
+			jwtData := new(JwtData)
+
+			jsonErr := json.Unmarshal(tokenArray, &jwtData)
+			if jsonErr != nil {
+				return nil, jsonErr
+			}
+
+			return jwtData, nil
+		}
+
+		return nil, errors.New(fmt.Sprintf("Can't get jwtToken response_status_code: %v", response.StatusCode))
+	}
+}
+
+func basicCredentials(setting *credential.TokenCredentialSetting) (*JwtData, error) {
+	request := new(client.HttpClientRequestData)
+	data := url.Values{}
+	data.Set("grant_type", "client_credentials")
+
+	request.Body = []byte(data.Encode())
+	request.Method = "POST"
+	request.Url = setting.AuthEndpoint
+
+	credential := fmt.Sprintf("%s:%s", setting.Basic.Username, setting.Basic.Password)
+	credentialEncoded := base64.StdEncoding.EncodeToString([]byte(credential))
+
+	request.SetHeader("Content-Type", "application/x-www-form-urlencoded")
+	request.SetHeader("Authorization", fmt.Sprintf("Basic %s", credentialEncoded))
+
 	ctx := context.Background()
 
 	response, err := client.HttpClientDo(ctx, request)

@@ -1,23 +1,24 @@
 package token_credential_settings
 
 import (
-	"fmt"
 	"strings"
 	"wrench/app/manifest/validation"
 )
 
 type TokenCredentialSetting struct {
-	Id           string              `yaml:"id"`
-	Type         TokenCredentialType `yaml:"type"`
-	AuthEndpoint string              `yaml:"authEndpoint"`
-	ClientId     string              `yaml:"clientId"`
-	ClientSecret string              `yaml:"clientSecret"`
+	Id               string                   `yaml:"id"`
+	Type             TokenCredentialType      `yaml:"type"`
+	AuthEndpoint     string                   `yaml:"authEndpoint"`
+	IsOpaque         bool                     `yaml:"isOpaque"`
+	ClientCredential *ClientCredentialSetting `yaml:"clientCredential"`
+	Basic            *BasicSetting            `yaml:"basic"`
 }
 
 type TokenCredentialType string
 
 const (
-	TokenCredentialClientCredential TokenCredentialType = "clientCredentials"
+	TokenCredentialClientCredential TokenCredentialType = "client_credentials"
+	TokenCredentialBasicCredential  TokenCredentialType = "basic"
 )
 
 func (setting TokenCredentialSetting) Valid() validation.ValidateResult {
@@ -35,16 +36,22 @@ func (setting TokenCredentialSetting) Valid() validation.ValidateResult {
 		result.AddError("tokenCredentials.authEndpoint is required")
 	}
 
-	if len(setting.ClientId) == 0 {
-		result.AddError("tokenCredentials.clientId is required")
+	if setting.Type == TokenCredentialClientCredential {
+
+		if setting.ClientCredential == nil {
+			result.AddError("tokenCredentials.ClientCredential is required")
+		} else {
+			result.AppendValidable(setting.ClientCredential)
+		}
 	}
 
-	if len(setting.ClientSecret) == 0 {
-		result.AddError("tokenCredentials.clientSecret is required")
-	}
+	if setting.Type == TokenCredentialBasicCredential {
 
-	if setting.Type != TokenCredentialClientCredential {
-		result.AddError(fmt.Sprintf("tokenCredentials.type should be %s", TokenCredentialClientCredential))
+		if setting.Basic == nil {
+			result.AddError("tokenCredentials.Basic is required")
+		} else {
+			result.AppendValidable(setting.Basic)
+		}
 	}
 
 	return result
