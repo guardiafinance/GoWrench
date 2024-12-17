@@ -9,11 +9,11 @@ import (
 )
 
 type JwtData struct {
-	AccessToken      string `json:"access_token"`
-	ExpiresIn        int    `json:"expires_in"`
-	RefreshExpiresIn int    `json:"refresh_expires_in"`
-	TokenType        string `json:"token_type"`
-	Scope            string `json:"scope"`
+	AccessToken      string  `json:"access_token"`
+	ExpiresIn        float64 `json:"expires_in"`
+	RefreshExpiresIn int     `json:"refresh_expires_in"`
+	TokenType        string  `json:"token_type"`
+	Scope            string  `json:"scope"`
 
 	jwtPaylodData map[string]interface{}
 }
@@ -26,11 +26,17 @@ func (jwt *JwtData) LoadJwtPayload() {
 	}
 }
 
-func (jwt *JwtData) IsExpired(lessTimeMinutes float64) bool {
+func (jwt *JwtData) IsExpired(lessTimeMinutes float64, isOpaque bool) bool {
 
-	exp, ok := jwt.jwtPaylodData["exp"].(float64)
-	if !ok {
-		return true
+	var exp float64
+	var ok bool
+	if isOpaque == false {
+		exp, ok = jwt.jwtPaylodData["exp"].(float64)
+		if !ok {
+			return true
+		}
+	} else {
+		exp = jwt.ExpiresIn
 	}
 
 	lessTimes := -time.Duration(lessTimeMinutes) * time.Minute
