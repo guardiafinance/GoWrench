@@ -27,7 +27,8 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 		var action, err = settings.GetActionById(endpoint.ActionID)
 
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
+			continue
 		}
 
 		if action.Trigger != nil && action.Trigger.Before != nil {

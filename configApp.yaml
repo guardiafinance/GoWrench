@@ -1,7 +1,7 @@
 version: 1
 
 service:
-  name: test-app
+  name: "{{SERVICE_NAME}}"
   version: 1.0.0
 
 # tokenCredentials:
@@ -25,7 +25,7 @@ api:
       method: post
       actionId: post_customer
       
-    - route: /api/hello
+    - route: /api/hellos
       method: get
       actionId: get_hello
 

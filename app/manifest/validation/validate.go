@@ -8,7 +8,7 @@ type ValidateResult struct {
 	errors []string
 }
 
-func (v ValidateResult) GetError() []string {
+func (v ValidateResult) GetErrors() []string {
 	return v.errors
 }
 

@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
+	"strings"
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
 	"wrench/app/startup"
@@ -14,6 +16,8 @@ import (
 )
 
 func main() {
+	loadBashFiles()
+
 	startup.LoadEnvsFiles()
 
 	byteArray, err := startup.LoadYamlFile(getFileConfigPath())
@@ -28,18 +32,43 @@ func main() {
 	}
 
 	application_settings.ApplicationSettingsStatic = applicationSetting
-	var result = applicationSetting.Valid()
 
-	if result.HasError() == true {
-		var errors = result.GetError()
-		for _, error := range errors {
-			fmt.Println(error)
+	go token_credentials.LoadTokenCredentialAuthentication()
+	var router = startup.LoadApplicationSettings(applicationSetting)
+	port := getPort()
+	log.Print(fmt.Sprintf("Server listen in port %s", port))
+	http.ListenAndServe(port, router)
+}
+
+func loadBashFiles() {
+	envbashFiles := os.Getenv(app.ENV_PATH_FOLDER_ENV_FILES)
+
+	if len(envbashFiles) == 0 {
+		envbashFiles = "wrench/bash/startup.sh"
+	}
+
+	bashFiles := strings.Split(envbashFiles, ",")
+	bashRun(bashFiles)
+}
+
+func bashRun(paths []string) {
+	for _, path := range paths {
+		path = strings.TrimSpace(path)
+		if _, err := os.Stat(path); err != nil {
+			log.Print(fmt.Sprintf("file bash %s not found", path))
+			continue
 		}
-	} else {
-		go token_credentials.LoadTokenCredentialAuthentication()
-		var router = startup.LoadApplicationSettings(applicationSetting)
-		port := getPort()
-		http.ListenAndServe(port, router)
+
+		log.Print(fmt.Sprintf("Will process file bash %s", path))
+		cmd := exec.Command("/bin/sh", "./"+path)
+
+		output, err := cmd.Output()
+		if err != nil {
+			log.Print("Error: ", err)
+			return
+		} else {
+			log.Print(output)
+		}
 	}
 }
 
