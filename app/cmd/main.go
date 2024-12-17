@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
+	"wrench/app/otel"
 	"wrench/app/startup"
 	"wrench/app/startup/token_credentials"
 
@@ -16,6 +18,9 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
+	otel.LogProvider(ctx)
+
 	loadBashFiles()
 
 	startup.LoadEnvsFiles()

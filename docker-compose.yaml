@@ -7,6 +7,9 @@ services:
     - 9092:9092
     environment:
     - PATH_FILE_CONFIG=/configApp.yaml
+    - OTEL_SERVICE_NAME="my-service"
+    - OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:2001"
+    - OTEL_EXPORTER_OTLP_INSECURE=true 
     volumes:
     - ./configApp.yaml:/configApp.yaml
     - ./startup.sh:/wrench/bash/startup.sh
