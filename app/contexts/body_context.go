@@ -39,7 +39,7 @@ func (bodyContext *BodyContext) SetHeader(key string, value string) {
 	}
 }
 
-func (bodyContext *BodyContext) ParseMapObject() map[string]interface{} {
+func (bodyContext *BodyContext) ParseBodyToMapObject() map[string]interface{} {
 	var jsonMap map[string]interface{}
 	jsonErr := json.Unmarshal(bodyContext.BodyByteArray, &jsonMap)
 
@@ -47,4 +47,24 @@ func (bodyContext *BodyContext) ParseMapObject() map[string]interface{} {
 		return nil
 	}
 	return jsonMap
+}
+
+func (bodyContext *BodyContext) ParseBodyToMapObjectArray() []map[string]interface{} {
+	var jsonMap []map[string]interface{}
+	jsonErr := json.Unmarshal(bodyContext.BodyByteArray, &jsonMap)
+
+	if jsonErr != nil {
+		return nil
+	}
+	return jsonMap
+}
+
+func (bodyContext *BodyContext) SetMapObject(jsonMap map[string]interface{}) {
+	jsonArray, _ := json.Marshal(jsonMap)
+	bodyContext.BodyByteArray = jsonArray
+}
+
+func (bodyContext *BodyContext) SetArrayMapObject(arrayJsonMap []map[string]interface{}) {
+	jsonArray, _ := json.Marshal(arrayJsonMap)
+	bodyContext.BodyByteArray = jsonArray
 }

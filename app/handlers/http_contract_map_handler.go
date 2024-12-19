@@ -18,18 +18,30 @@ func (handler *HttpContractMapHandler) Do(ctx context.Context, wrenchContext *co
 		isArray := bodyContext.IsArray()
 
 		if isArray {
-			resultBodyArray := make([]map[string]interface{})
-
-		} else {
-			currentBodyContext := bodyContext.BodyByteArray
-
-			if len(handler.ContractMap.Sequence) > 0 {
-				currentBodyContext = handler.doSequency(wrenchContext, bodyContext)
-			} else {
-				currentBodyContext = handler.doDefault(wrenchContext, bodyContext)
+			currentBodyContextArray := bodyContext.ParseBodyToMapObjectArray()
+			lenArrayBody := len(currentBodyContextArray)
+			if lenArrayBody > 0 {
+				resultCurrentBodyContext := make([]map[string]interface{}, lenArrayBody)
+				for i, currentBodyContext := range currentBodyContextArray {
+					if len(handler.ContractMap.Sequence) > 0 {
+						currentBodyContext = handler.doSequency(wrenchContext, bodyContext, currentBodyContext)
+					} else {
+						currentBodyContext = handler.doDefault(wrenchContext, bodyContext, currentBodyContext)
+					}
+					resultCurrentBodyContext[i] = currentBodyContext
+				}
+				bodyContext.SetArrayMapObject(resultCurrentBodyContext)
 			}
 
-			bodyContext.BodyByteArray = currentBodyContext
+		} else {
+			currentBodyContext := bodyContext.ParseBodyToMapObject()
+
+			if len(handler.ContractMap.Sequence) > 0 {
+				currentBodyContext = handler.doSequency(wrenchContext, bodyContext, currentBodyContext)
+			} else {
+				currentBodyContext = handler.doDefault(wrenchContext, bodyContext, currentBodyContext)
+			}
+			bodyContext.SetMapObject(currentBodyContext)
 		}
 	}
 
@@ -38,9 +50,7 @@ func (handler *HttpContractMapHandler) Do(ctx context.Context, wrenchContext *co
 	}
 }
 
-func (handler *HttpContractMapHandler) doDefault(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]interface{} {
-
-	currentBodyContext := bodyContext.BodyByteArray
+func (handler *HttpContractMapHandler) doDefault(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext, currentBodyContext map[string]interface{}) map[string]interface{} {
 
 	if handler.ContractMap.Rename != nil {
 		currentBodyContext = json_map.RenameProperties(currentBodyContext, handler.ContractMap.Rename)
@@ -69,9 +79,7 @@ func (handler *HttpContractMapHandler) doDefault(wrenchContext *contexts.WrenchC
 	return currentBodyContext
 }
 
-func (handler *HttpContractMapHandler) doSequency(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]interface{} {
-	currentBodyContext := bodyContext.BodyByteArray
-
+func (handler *HttpContractMapHandler) doSequency(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext, currentBodyContext map[string]interface{}) map[string]interface{} {
 	for _, action := range handler.ContractMap.Sequence {
 		if action == "rename" {
 			currentBodyContext = json_map.RenameProperties(currentBodyContext, handler.ContractMap.Rename)
