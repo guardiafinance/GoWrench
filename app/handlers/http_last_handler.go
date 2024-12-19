@@ -22,7 +22,7 @@ func (httpLast *HttpLastHandler) Do(ctx context.Context, wrenchContext *contexts
 	}
 
 	w.WriteHeader(bodyContext.HttpStatusCode)
-	w.Write(bodyContext.BodyArray)
+	w.Write(bodyContext.BodyByteArray)
 
 	if httpLast.Next != nil {
 		httpLast.Next.Do(ctx, wrenchContext, bodyContext)

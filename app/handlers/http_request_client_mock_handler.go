@@ -15,7 +15,7 @@ func (handler *HttpRequestClientMockHandler) Do(ctx context.Context, wrenchConte
 
 	if wrenchContext.HasError == false {
 		if handler.ActionSettings.Http.Mock.MirrorBody == false {
-			bodyContext.BodyArray = []byte(handler.ActionSettings.Http.Mock.Body)
+			bodyContext.BodyByteArray = []byte(handler.ActionSettings.Http.Mock.Body)
 		}
 		bodyContext.ContentType = handler.ActionSettings.Http.Mock.ContentType
 		bodyContext.HttpStatusCode = handler.ActionSettings.Http.Mock.StatusCode

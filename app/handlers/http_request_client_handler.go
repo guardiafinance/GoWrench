@@ -20,7 +20,7 @@ func (handler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *
 	if wrenchContext.HasError == false {
 
 		request := new(client.HttpClientRequestData)
-		request.Body = bodyContext.BodyArray
+		request.Body = bodyContext.BodyByteArray
 		request.Method = string(handler.ActionSettings.Http.Request.Method)
 		request.Url = handler.ActionSettings.Http.Request.Url
 		request.Insecure = handler.ActionSettings.Http.Request.Insecure
@@ -45,7 +45,7 @@ func (handler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *
 			wrenchContext.SetHasError()
 		}
 
-		bodyContext.BodyArray = response.Body
+		bodyContext.BodyByteArray = response.Body
 		bodyContext.HttpStatusCode = response.StatusCode
 		if handler.ActionSettings.Http.Response != nil {
 			bodyContext.SetHeaders(handler.ActionSettings.Http.Response.MapFixedHeaders)

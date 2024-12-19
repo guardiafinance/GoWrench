@@ -1,7 +1,6 @@
 package json_map
 
 import (
-	"encoding/json"
 	"strings"
 	"time"
 	"wrench/app/contexts"
@@ -10,17 +9,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetValue(jsonValue []byte, propertyName string, deleteProperty bool) (string, []byte) {
+func GetValue(jsonMap map[string]interface{}, propertyName string, deleteProperty bool) (string, map[string]interface{}) {
 	value := ""
 
 	var jsonMapCurrent map[string]interface{}
-	var jsonMap map[string]interface{}
-	jsonErr := json.Unmarshal(jsonValue, &jsonMap)
-
-	if jsonErr != nil {
-		return "", jsonValue
-	}
-
 	jsonMapCurrent = jsonMap
 	propertyNameSplitted := strings.Split(propertyName, ".")
 
@@ -42,21 +34,11 @@ func GetValue(jsonValue []byte, propertyName string, deleteProperty bool) (strin
 			break
 		}
 	}
-
-	jsonArray, _ := json.Marshal(jsonMap)
-	return value, jsonArray
+	return value, jsonMapCurrent
 }
 
-func SetValue(jsonValue []byte, propertyName string, newValue string) []byte {
-
+func SetValue(jsonMap map[string]interface{}, propertyName string, newValue string) map[string]interface{} {
 	var jsonMapCurrent map[string]interface{}
-	var jsonMap map[string]interface{}
-	jsonErr := json.Unmarshal(jsonValue, &jsonMap)
-
-	if jsonErr != nil {
-		return jsonValue
-	}
-
 	jsonMapCurrent = jsonMap
 	propertyNameSplitted := strings.Split(propertyName, ".")
 	total := len(propertyNameSplitted)
@@ -73,16 +55,12 @@ func SetValue(jsonValue []byte, propertyName string, newValue string) []byte {
 		}
 	}
 
-	jsonArray, _ := json.Marshal(jsonMap)
-	return jsonArray
+	return jsonMapCurrent
 }
 
-func CreateProperty(jsonValue []byte, propertyName string, value string) []byte {
+func CreateProperty(jsonMap map[string]interface{}, propertyName string, value string) map[string]interface{} {
 
 	var jsonMapCurrent map[string]interface{}
-	var jsonMap map[string]interface{}
-	json.Unmarshal(jsonValue, &jsonMap)
-
 	jsonMapCurrent = jsonMap
 	propertyNameSplitted := strings.Split(propertyName, ".")
 	total := len(propertyNameSplitted)
@@ -103,13 +81,11 @@ func CreateProperty(jsonValue []byte, propertyName string, value string) []byte 
 			jsonMapCurrent[property] = value
 		}
 	}
-
-	jsonArray, _ := json.Marshal(jsonMap)
-	return jsonArray
+	return jsonMapCurrent
 }
 
-func RenameProperties(jsonValue []byte, properties []string) []byte {
-	jsonValueCurrent := jsonValue
+func RenameProperties(jsonMap map[string]interface{}, properties []string) map[string]interface{} {
+	jsonValueCurrent := jsonMap
 	for _, property := range properties {
 		propertyNameSplitted := strings.Split(property, ":")
 		propertyNameOld := propertyNameSplitted[0]
@@ -119,8 +95,8 @@ func RenameProperties(jsonValue []byte, properties []string) []byte {
 	return jsonValueCurrent
 }
 
-func DuplicatePropertiesValue(jsonValue []byte, properties []string) []byte {
-	jsonValueCurrent := jsonValue
+func DuplicatePropertiesValue(jsonMap map[string]interface{}, properties []string) map[string]interface{} {
+	jsonValueCurrent := jsonMap
 	for _, property := range properties {
 		propertyNameSplitted := strings.Split(property, ":")
 		propertyNameSource := propertyNameSplitted[0]
@@ -130,22 +106,22 @@ func DuplicatePropertiesValue(jsonValue []byte, properties []string) []byte {
 	return jsonValueCurrent
 }
 
-func DuplicatePropertyValue(jsonValue []byte, propertyNameSource string, propertyNameDestination string) []byte {
-	value, jsonValue := GetValue(jsonValue, propertyNameSource, false)
+func DuplicatePropertyValue(jsonMap map[string]interface{}, propertyNameSource string, propertyNameDestination string) map[string]interface{} {
+	value, jsonValue := GetValue(jsonMap, propertyNameSource, false)
 	return CreateProperty(jsonValue, propertyNameDestination, value)
 }
 
-func RenameProperty(jsonValue []byte, propertyNameOld string, propertyNameNew string) []byte {
-	value, jsonValue := GetValue(jsonValue, propertyNameOld, true)
+func RenameProperty(jsonMap map[string]interface{}, propertyNameOld string, propertyNameNew string) map[string]interface{} {
+	value, jsonValue := GetValue(jsonMap, propertyNameOld, true)
 	return CreateProperty(jsonValue, propertyNameNew, value)
 }
 
-func RemoveProperties(jsonValue []byte, propertiesName []string) []byte {
+func RemoveProperties(jsonMap map[string]interface{}, propertiesName []string) map[string]interface{} {
 	if propertiesName == nil {
 		return nil
 	}
 
-	currentJsonValue := jsonValue
+	currentJsonValue := jsonMap
 	for _, property := range propertiesName {
 		currentJsonValue = RemoveProperty(currentJsonValue, property)
 	}
@@ -153,11 +129,8 @@ func RemoveProperties(jsonValue []byte, propertiesName []string) []byte {
 	return currentJsonValue
 }
 
-func RemoveProperty(jsonValue []byte, propertyName string) []byte {
+func RemoveProperty(jsonMap map[string]interface{}, propertyName string) map[string]interface{} {
 	var jsonMapCurrent map[string]interface{}
-	var jsonMap map[string]interface{}
-	json.Unmarshal(jsonValue, &jsonMap)
-
 	jsonMapCurrent = jsonMap
 
 	propertyNameSplitted := strings.Split(propertyName, ".")
@@ -178,12 +151,11 @@ func RemoveProperty(jsonValue []byte, propertyName string) []byte {
 		}
 	}
 
-	jsonArray, _ := json.Marshal(jsonMap)
-	return jsonArray
+	return jsonMapCurrent
 }
 
-func CreatePropertiesInterpolationValue(jsonValue []byte, propertiesValues []string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) []byte {
-	jsonValueCurrent := jsonValue
+func CreatePropertiesInterpolationValue(jsonMap map[string]interface{}, propertiesValues []string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]interface{} {
+	jsonValueCurrent := jsonMap
 	for _, propertyValue := range propertiesValues {
 		propertyValueSplitted := strings.Split(propertyValue, ":")
 		propertyName := propertyValueSplitted[0]
@@ -202,7 +174,7 @@ func replaceCalculatedValue(command string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(command, "{{", ""), "}}", "")
 }
 
-func CreatePropertyInterpolationValue(jsonValue []byte, propertyName string, value string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) []byte {
+func CreatePropertyInterpolationValue(jsonMap map[string]interface{}, propertyName string, value string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]interface{} {
 	valueResult := value
 
 	if calculatedValue(value) {
@@ -225,7 +197,7 @@ func CreatePropertyInterpolationValue(jsonValue []byte, propertyName string, val
 
 	}
 
-	return CreateProperty(jsonValue, propertyName, valueResult)
+	return CreateProperty(jsonMap, propertyName, valueResult)
 }
 
 const wrenchContextRequestHeaders = "wrenchContext.request.headers."
@@ -242,8 +214,8 @@ func getValueWrenchContext(command string, wrenchContext *contexts.WrenchContext
 
 const bodyContext = "bodyContext."
 
-func ParseValues(jsonValue []byte, parse *maps.ParseSettings) []byte {
-	jsonValueCurrent := jsonValue
+func ParseValues(jsonMap map[string]interface{}, parse *maps.ParseSettings) map[string]interface{} {
+	jsonValueCurrent := jsonMap
 	if parse.WhenEquals != nil {
 		for _, whenEqual := range parse.WhenEquals {
 			if calculatedValue(whenEqual) {
@@ -263,7 +235,7 @@ func ParseValues(jsonValue []byte, parse *maps.ParseSettings) []byte {
 
 				parseToValue := whenEqualSplitted[1] // value if equals should be used
 
-				valueCurrent, _ := GetValue(jsonValue, propertyName, false)
+				valueCurrent, _ := GetValue(jsonMap, propertyName, false)
 
 				if valueCurrent == equalValue {
 					jsonValueCurrent = SetValue(jsonValueCurrent, propertyName, parseToValue)

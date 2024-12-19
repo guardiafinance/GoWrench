@@ -15,38 +15,22 @@ type HttpContractMapHandler struct {
 func (handler *HttpContractMapHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
 	if wrenchContext.HasError == false {
-		currentBodyContext := bodyContext.BodyArray
+		isArray := bodyContext.IsArray()
 
-		if len(handler.ContractMap.Sequence) > 0 {
-			currentBodyContext = handler.doSequency(wrenchContext, bodyContext)
+		if isArray {
+			resultBodyArray := make([]map[string]interface{})
+
 		} else {
+			currentBodyContext := bodyContext.BodyByteArray
 
-			if handler.ContractMap.Rename != nil {
-				currentBodyContext = json_map.RenameProperties(currentBodyContext, handler.ContractMap.Rename)
+			if len(handler.ContractMap.Sequence) > 0 {
+				currentBodyContext = handler.doSequency(wrenchContext, bodyContext)
+			} else {
+				currentBodyContext = handler.doDefault(wrenchContext, bodyContext)
 			}
 
-			if handler.ContractMap.New != nil {
-				currentBodyContext = json_map.CreatePropertiesInterpolationValue(
-					currentBodyContext,
-					handler.ContractMap.New,
-					wrenchContext,
-					bodyContext)
-			}
-
-			if handler.ContractMap.Duplicate != nil {
-				currentBodyContext = json_map.DuplicatePropertiesValue(currentBodyContext, handler.ContractMap.Duplicate)
-			}
-
-			if handler.ContractMap.Remove != nil {
-				currentBodyContext = json_map.RemoveProperties(currentBodyContext, handler.ContractMap.Remove)
-			}
-
-			if handler.ContractMap.Parse != nil {
-				currentBodyContext = json_map.ParseValues(currentBodyContext, handler.ContractMap.Parse)
-			}
+			bodyContext.BodyByteArray = currentBodyContext
 		}
-
-		bodyContext.BodyArray = currentBodyContext
 	}
 
 	if handler.Next != nil {
@@ -54,8 +38,39 @@ func (handler *HttpContractMapHandler) Do(ctx context.Context, wrenchContext *co
 	}
 }
 
-func (handler *HttpContractMapHandler) doSequency(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) []byte {
-	currentBodyContext := bodyContext.BodyArray
+func (handler *HttpContractMapHandler) doDefault(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]interface{} {
+
+	currentBodyContext := bodyContext.BodyByteArray
+
+	if handler.ContractMap.Rename != nil {
+		currentBodyContext = json_map.RenameProperties(currentBodyContext, handler.ContractMap.Rename)
+	}
+
+	if handler.ContractMap.New != nil {
+		currentBodyContext = json_map.CreatePropertiesInterpolationValue(
+			currentBodyContext,
+			handler.ContractMap.New,
+			wrenchContext,
+			bodyContext)
+	}
+
+	if handler.ContractMap.Duplicate != nil {
+		currentBodyContext = json_map.DuplicatePropertiesValue(currentBodyContext, handler.ContractMap.Duplicate)
+	}
+
+	if handler.ContractMap.Remove != nil {
+		currentBodyContext = json_map.RemoveProperties(currentBodyContext, handler.ContractMap.Remove)
+	}
+
+	if handler.ContractMap.Parse != nil {
+		currentBodyContext = json_map.ParseValues(currentBodyContext, handler.ContractMap.Parse)
+	}
+
+	return currentBodyContext
+}
+
+func (handler *HttpContractMapHandler) doSequency(wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]interface{} {
+	currentBodyContext := bodyContext.BodyByteArray
 
 	for _, action := range handler.ContractMap.Sequence {
 		if action == "rename" {
