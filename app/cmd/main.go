@@ -41,7 +41,7 @@ func main() {
 }
 
 func loadBashFiles() {
-	envbashFiles := os.Getenv(app.ENV_PATH_FOLDER_ENV_FILES)
+	envbashFiles := os.Getenv(app.ENV_RUN_BASH_FILES_BEFORE_STARTUP)
 
 	if len(envbashFiles) == 0 {
 		envbashFiles = "wrench/bash/startup.sh"
