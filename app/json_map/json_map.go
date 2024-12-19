@@ -34,7 +34,7 @@ func GetValue(jsonMap map[string]interface{}, propertyName string, deletePropert
 			break
 		}
 	}
-	return value, jsonMapCurrent
+	return value, jsonMap
 }
 
 func SetValue(jsonMap map[string]interface{}, propertyName string, newValue string) map[string]interface{} {
@@ -55,7 +55,7 @@ func SetValue(jsonMap map[string]interface{}, propertyName string, newValue stri
 		}
 	}
 
-	return jsonMapCurrent
+	return jsonMap
 }
 
 func CreateProperty(jsonMap map[string]interface{}, propertyName string, value string) map[string]interface{} {
@@ -81,7 +81,7 @@ func CreateProperty(jsonMap map[string]interface{}, propertyName string, value s
 			jsonMapCurrent[property] = value
 		}
 	}
-	return jsonMapCurrent
+	return jsonMap
 }
 
 func RenameProperties(jsonMap map[string]interface{}, properties []string) map[string]interface{} {
@@ -151,7 +151,7 @@ func RemoveProperty(jsonMap map[string]interface{}, propertyName string) map[str
 		}
 	}
 
-	return jsonMapCurrent
+	return jsonMap
 }
 
 func CreatePropertiesInterpolationValue(jsonMap map[string]interface{}, propertiesValues []string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]interface{} {
