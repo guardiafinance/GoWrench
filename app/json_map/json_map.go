@@ -322,6 +322,8 @@ func parseOperatorValues(jsonMap map[string]interface{}, operator []maps.Operato
 				arrayJsonMap := make([]interface{}, 1)
 				arrayJsonMap[0] = value
 				jsonValueCurrent = SetValue(jsonValueCurrent, propertyName, arrayJsonMap)
+			} else if operatorCommand == "get_first" {
+				arrayValue := json_map.Get
 			}
 		}
 	}

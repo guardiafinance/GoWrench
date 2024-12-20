@@ -7,7 +7,8 @@ import (
 type Operator string
 
 const (
-	OperatorToArray Operator = "to_array"
+	OperatorToArray  Operator = "to_array"
+	OperatorGetFirst Operator = "get_first"
 )
 
 type ParseSettings struct {

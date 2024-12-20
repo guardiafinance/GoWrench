@@ -78,7 +78,7 @@ actions:
       before:
         contractMapId: before_customer_create2
       after:
-        contractMapId: after_customer_create
+        contractMapId: after_customer_create2
     http:
       request:
         method: post
@@ -129,6 +129,11 @@ contract:
     parse:
       operator:
       - "{{bodyContext}}.to_array"
+
+  - id: after_customer_create2
+    parse:
+      operator:
+      - "{{bodyContext}}.get_first"
     
   - id: after_customer_create
     remove:
