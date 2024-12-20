@@ -42,37 +42,30 @@ func GetValue(jsonMap map[string]interface{}, propertyName string, deletePropert
 	return value, jsonMap
 }
 
-func GetArrayValue(jsonMap map[string]interface{}, propertyName string, deleteProperty bool) (interface{}, map[string]interface{}) {
-	var value []interface{}
+func getArrayValue(jsonMap map[string]interface{}, propertyName string) []map[string]interface{} {
+	var value []map[string]interface{}
 
-	var jsonMapCurrent map[string]interface{}
-	jsonMapCurrent = jsonMap
+	jsonMapCurrent := jsonMap
 	propertyNameSplitted := strings.Split(propertyName, ".")
 	index := 0
 	for i, property := range propertyNameSplitted {
-		index++
-		valueObject, ok := jsonMapCurrent[property].([]interface{})
+
+		valueObject, ok := jsonMapCurrent[property].(map[string]interface{})
 		if ok {
 			jsonMapCurrent = valueObject
-			if i == index {
-				value = jsonMapCurrent
-				break
-			}
 			continue
 		}
 
-		valueTempString, ok := jsonMapCurrent[property].(string)
+		valueArray, ok := jsonMapCurrent[property].([]map[string]interface{})
 		if ok {
-			value = valueTempString
-
-			if deleteProperty {
-				delete(jsonMapCurrent, property)
+			if i == index {
+				value = valueArray
+				break
 			}
-
-			break
 		}
+		index++
 	}
-	return value, jsonMap
+	return value
 }
 
 func SetValue(jsonMap map[string]interface{}, propertyName string, newValue interface{}) map[string]interface{} {
@@ -347,11 +340,5 @@ func SetObjectRoot(jsonMap map[string]interface{}, propertyName string) map[stri
 }
 
 func SetArrayRoot(jsonMap map[string]interface{}, propertyName string) []map[string]interface{} {
-	value, _ := GetValue(jsonMap, propertyName, false)
-
-	objectArrayValue, isObjectArray := value.([]map[string]interface{})
-	if isObjectArray {
-		return objectArrayValue
-	}
-	return nil
+	return getArrayValue(jsonMap, propertyName)
 }

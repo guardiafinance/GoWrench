@@ -107,6 +107,10 @@ func (handler *HttpContractMapHandler) doSequency(wrenchContext *contexts.Wrench
 			currentBodyContext = json_map.ParseValues(currentBodyContext, handler.ContractMap.Parse)
 		} else if action == "setObjectRoot" {
 			currentBodyContext = json_map.SetObjectRoot(currentBodyContext, handler.ContractMap.SetObjectRoot)
+		} else if action == "setArrayRoot" {
+			currentBodyContextArray := json_map.SetArrayRoot(currentBodyContext, handler.ContractMap.SetArrayRoot)
+			bodyContext.SetArrayMapObject(currentBodyContextArray)
+			currentBodyContext = nil
 		}
 	}
 
