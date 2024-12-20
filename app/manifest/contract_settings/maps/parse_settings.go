@@ -4,8 +4,15 @@ import (
 	"wrench/app/manifest/validation"
 )
 
+type Operator string
+
+const (
+	OperatorToArray Operator = "to_array"
+)
+
 type ParseSettings struct {
-	WhenEquals []string `yaml:"whenEquals"`
+	WhenEquals []string   `yaml:"whenEquals"`
+	Operator   []Operator `yaml:"operator"`
 }
 
 func (setting ParseSettings) Valid() validation.ValidateResult {

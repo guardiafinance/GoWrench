@@ -76,7 +76,7 @@ actions:
     type: httpRequest
     trigger:
       before:
-        contractMapId: before_customer_create
+        contractMapId: before_customer_create2
       after:
         contractMapId: after_customer_create
     http:
@@ -118,8 +118,17 @@ contract:
     remove:
     - "document"
     parse:
+      operator:
+      - "{{bodyContext}}.to_array"
       whenEquals:
-        - "{{bodyContext.address.type.Mobile:Movel}}"
+      - "{{bodyContext.address.type.Mobile:Movel}}"
+
+  - id: before_customer_create2
+    #setObjectRoot: root
+    setArrayRoot: root
+    parse:
+      operator:
+      - "{{bodyContext}}.to_array"
     
   - id: after_customer_create
     remove:
