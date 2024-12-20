@@ -8,7 +8,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o whrenchapp ./app/cmd
 #####
 
-FROM alpine
+FROM ubunto
 
 # Comentado devido a necessidade de execucao com o usuario root
 # RUN addgroup -S nonroot && adduser -S nonroot -G nonroot
