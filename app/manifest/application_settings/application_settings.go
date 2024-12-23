@@ -4,10 +4,13 @@ import (
 	"errors"
 	"wrench/app/manifest/action_settings"
 	"wrench/app/manifest/api_settings"
+	"wrench/app/manifest/aws"
 	"wrench/app/manifest/contract_settings"
 	"wrench/app/manifest/service_settings"
 	credential "wrench/app/manifest/token_credential_settings"
 	"wrench/app/manifest/validation"
+
+	"gopkg.in/yaml.v3"
 )
 
 var ApplicationSettingsStatic *ApplicationSettings
@@ -18,6 +21,7 @@ type ApplicationSettings struct {
 	Service          *service_settings.ServiceSettings    `yaml:"service"`
 	TokenCredentials []*credential.TokenCredentialSetting `yaml:"tokenCredentials"`
 	Contract         *contract_settings.ContractSetting   `yaml:"contract"`
+	Aws              *aws.AwsSettings                     `yaml:"aws"`
 }
 
 func (settings ApplicationSettings) GetActionById(actionId string) (*action_settings.ActionSettings, error) {
@@ -58,4 +62,14 @@ func (settings ApplicationSettings) Valid() validation.ValidateResult {
 	}
 
 	return result
+}
+
+func ParseToApplicationSetting(data []byte) (*ApplicationSettings, error) {
+
+	applicationSettings := new(ApplicationSettings)
+	err := yaml.Unmarshal(data, applicationSettings)
+	if err != nil {
+		return nil, err
+	}
+	return applicationSettings, nil
 }

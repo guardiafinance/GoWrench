@@ -5,15 +5,21 @@ import (
 	"os"
 	"strings"
 	handler "wrench/app/handlers"
-	settings "wrench/app/manifest/api_settings"
 	"wrench/app/manifest/application_settings"
 
 	"github.com/gorilla/mux"
 )
 
-func LoadApiEndpoint(endpoints []settings.EndpointSettings) *mux.Router {
+func LoadApiEndpoint() *mux.Router {
+	app := application_settings.ApplicationSettingsStatic
+	endpoints := app.Api.Endpoints
+	if len(endpoints) == 0 {
+		return nil
+	}
+
 	r := mux.NewRouter()
 	initialPage := new(InitialPage)
+	initialPage.Append("<h2>Service: " + app.Service.Name + "version: " + app.Service.Version + "</h2>")
 
 	initialPage.Append("<h2>Endpoints</h2>")
 	for _, endpoint := range endpoints {

@@ -4,6 +4,12 @@ service:
   name: "{{SERVICE_NAME}}"
   version: 1.0.0
 
+aws:
+  region: us-east-1
+  secret:
+    secretsName:
+    - "auth-keycloak"
+    
 # tokenCredentials:
 #   - id: auth_client
 #     type: clientCredentials
