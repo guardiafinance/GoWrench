@@ -11,8 +11,6 @@ import (
 	"wrench/app/manifest/application_settings"
 	"wrench/app/startup"
 	"wrench/app/startup/token_credentials"
-
-	"gopkg.in/yaml.v3"
 )
 
 func main() {
@@ -21,14 +19,16 @@ func main() {
 	startup.LoadEnvsFiles()
 
 	byteArray, err := startup.LoadYamlFile(getFileConfigPath())
+	startup.LoadAwsSecrets(byteArray)
 	if err != nil {
-		log.Fatalf("Error loading YAML: %v", err)
+		log.Printf("Error loading YAML: %v", err)
 	}
-	byteArray = startup.EnvInterpolation(byteArray)
 
-	applicationSetting, err := parseToApplicationSetting(byteArray)
+	byteArray = startup.EnvInterpolation(byteArray)
+	applicationSetting, err := application_settings.ParseToApplicationSetting(byteArray)
+
 	if err != nil {
-		log.Fatalf("Error parse yaml: %v", err)
+		log.Printf("Error parse yaml: %v", err)
 	}
 
 	application_settings.ApplicationSettingsStatic = applicationSetting
@@ -70,16 +70,6 @@ func bashRun(paths []string) {
 			log.Print(output)
 		}
 	}
-}
-
-func parseToApplicationSetting(data []byte) (*application_settings.ApplicationSettings, error) {
-
-	applicationSettings := new(application_settings.ApplicationSettings)
-	err := yaml.Unmarshal(data, applicationSettings)
-	if err != nil {
-		return nil, err
-	}
-	return applicationSettings, nil
 }
 
 func getFileConfigPath() string {

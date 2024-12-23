@@ -10,11 +10,5 @@ import (
 func LoadApplicationSettings(settings *settings.ApplicationSettings) *mux.Router {
 	var chain = handlers.ChainStatic.GetStatic()
 	chain.BuildChain(settings)
-
-	var endpoints = settings.Api.Endpoints
-	if len(endpoints) > 0 {
-		return LoadApiEndpoint(endpoints)
-	} else {
-		return nil
-	}
+	return LoadApiEndpoint()
 }
