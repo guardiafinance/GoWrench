@@ -1,7 +1,7 @@
-package aws
+package aws_settings
 
 import (
-	aws "wrench/app/manifest/aws/secrets"
+	aws "wrench/app/manifest/aws_settings/secrets_settings"
 	"wrench/app/manifest/validation"
 )
 

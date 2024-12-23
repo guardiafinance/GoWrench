@@ -4,7 +4,7 @@ import (
 	"errors"
 	"wrench/app/manifest/action_settings"
 	"wrench/app/manifest/api_settings"
-	"wrench/app/manifest/aws"
+	aws "wrench/app/manifest/aws_settings"
 	"wrench/app/manifest/contract_settings"
 	"wrench/app/manifest/service_settings"
 	credential "wrench/app/manifest/token_credential_settings"
