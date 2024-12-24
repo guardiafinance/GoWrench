@@ -100,24 +100,16 @@ actions:
 
 
   - id: get_customer
-    type: sqsPublish
-    sqs:
-      publish:
-        #insecure: true
-        topic: 'http://localhost:{{PORT}}/api/mock'
-        mapRequestHeaders:
-          - "mock1"
-          - "mock2:change2"
-        mapFixedHeaders:
-          "req1": "value1"
-          "req2": "value2"
-      response:
-        mapResponseHeaders:
-          - "mock1"
-          - "mock2:change2"
-        mapFixedHeaders:
-          "resp1": "value1"
-          "resp2": "value2"
+    type: snsPublish
+    sns:
+      topic: 'http://localhost:{{PORT}}/api/mock'
+      mapHeaders:
+        - "mock1"
+        - "mock2:change2"
+      mapFixedHeaders:
+        "req1": "value1"
+        "req2": "value2"
+      
 
         
 contract:
