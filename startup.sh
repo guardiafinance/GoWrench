@@ -1,2 +1,2 @@
 #!/bin/bash
-export SERVICE_NAME=test-bass
+export SERVICE_NAME=test-bash
