@@ -6,7 +6,8 @@ import (
 )
 
 type SnsSettings struct {
-	Topic           string            `yaml:"topic"`
+	TopicArn        string            `yaml:"topicArn"`
+	GroupId         string            `yaml:"groupId"`
 	MapHeaders      []string          `yaml:"mapHeaders"`
 	MapFixedHeaders map[string]string `yaml:"mapFixedHeaders"`
 }

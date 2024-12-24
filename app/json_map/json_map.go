@@ -166,19 +166,11 @@ func CreatePropertiesInterpolationValue(jsonMap map[string]interface{}, properti
 	return jsonValueCurrent
 }
 
-func calculatedValue(value string) bool {
-	return strings.HasPrefix(value, "{{") && strings.HasSuffix(value, "}}")
-}
-
-func replaceCalculatedValue(command string) string {
-	return strings.ReplaceAll(strings.ReplaceAll(command, "{{", ""), "}}", "")
-}
-
 func CreatePropertyInterpolationValue(jsonMap map[string]interface{}, propertyName string, value string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]interface{} {
 	valueResult := value
 
-	if calculatedValue(value) {
-		rawValue := replaceCalculatedValue(value)
+	if contexts.IsCalculatedValue(value) {
+		rawValue := contexts.ReplaceCalculatedValue(value)
 
 		if rawValue == "uuid" {
 			valueResult = uuid.New().String()
@@ -192,7 +184,7 @@ func CreatePropertyInterpolationValue(jsonMap map[string]interface{}, propertyNa
 				valueResult = timeNow.String()
 			}
 		} else if strings.HasPrefix(rawValue, "wrenchContext") {
-			valueResult = getValueWrenchContext(rawValue, wrenchContext)
+			valueResult = contexts.GetValueWrenchContext(rawValue, wrenchContext)
 		}
 
 	}
@@ -200,27 +192,13 @@ func CreatePropertyInterpolationValue(jsonMap map[string]interface{}, propertyNa
 	return CreateProperty(jsonMap, propertyName, valueResult)
 }
 
-const wrenchContextRequestHeaders = "wrenchContext.request.headers."
-
-func getValueWrenchContext(command string, wrenchContext *contexts.WrenchContext) string {
-
-	if strings.HasPrefix(command, wrenchContextRequestHeaders) {
-		headerName := strings.ReplaceAll(command, wrenchContextRequestHeaders, "")
-		return wrenchContext.Request.Header.Get(headerName)
-	}
-
-	return ""
-}
-
-const bodyContext = "bodyContext."
-
 func ParseValues(jsonMap map[string]interface{}, parse *maps.ParseSettings) map[string]interface{} {
 	jsonValueCurrent := jsonMap
 	if parse.WhenEquals != nil {
 		for _, whenEqual := range parse.WhenEquals {
-			if calculatedValue(whenEqual) {
-				whenEqual = strings.ReplaceAll(whenEqual, bodyContext, "")
-				rawWhenEqual := replaceCalculatedValue(whenEqual)
+			if contexts.IsCalculatedValue(whenEqual) {
+				whenEqual = contexts.ReplacePrefixBodyContext(whenEqual)
+				rawWhenEqual := contexts.ReplaceCalculatedValue(whenEqual)
 
 				whenEqualSplitted := strings.Split(rawWhenEqual, ":")
 				propertyNameWithEqualValue := whenEqualSplitted[0]

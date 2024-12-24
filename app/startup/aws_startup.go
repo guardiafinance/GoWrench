@@ -20,7 +20,8 @@ func LoadAwsSecrets(fileConfig []byte) {
 	}
 
 	setting := applicationSetting.Aws
-	if setting.AwsSecretSettings != nil &&
+	if setting != nil &&
+		setting.AwsSecretSettings != nil &&
 		len(setting.AwsSecretSettings.SecretsName) > 0 {
 		for _, secretName := range setting.AwsSecretSettings.SecretsName {
 			log.Print("Loading secret " + secretName)
