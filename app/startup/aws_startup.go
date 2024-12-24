@@ -24,7 +24,6 @@ func LoadAwsSecrets(fileConfig []byte) {
 		len(setting.AwsSecretSettings.SecretsName) > 0 {
 		for _, secretName := range setting.AwsSecretSettings.SecretsName {
 			secretValue := getSecretValue(setting.Region, secretName)
-			log.Print(secretValue)
 			secretMap, err := parseSecretToMap(secretValue)
 			if err == nil {
 				setMapToEnv(secretName, secretMap)
