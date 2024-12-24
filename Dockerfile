@@ -15,5 +15,5 @@ FROM ubuntu
 # USER nonroot
 
 COPY --from=build /app/whrenchapp /
-
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 ENTRYPOINT [ "/whrenchapp" ]
