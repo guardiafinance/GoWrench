@@ -67,6 +67,7 @@ func (handler *SnsPublishHandler) Do(ctx context.Context, wrenchContext *context
 			bodyContext.HttpStatusCode = 500
 			bodyContext.BodyByteArray = []byte(msg)
 			bodyContext.ContentType = "text/plain"
+			wrenchContext.SetHasError()
 		} else {
 			bodyContext.HttpStatusCode = 202
 			bodyContext.BodyByteArray = []byte("{ 'success': 'true' }")
