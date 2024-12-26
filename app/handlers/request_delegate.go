@@ -13,7 +13,7 @@ type RequestDelegate struct {
 	Endpoint *settings.EndpointSettings
 }
 
-func (request *RequestDelegate) FirstHttp(w http.ResponseWriter, r *http.Request) {
+func (request *RequestDelegate) HttpHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	requestURI := r.RequestURI
 	appSetting := appSetting.ApplicationSettingsStatic

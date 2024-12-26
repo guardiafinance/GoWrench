@@ -18,6 +18,10 @@ func (chain *Chain) GetStatic() *Chain {
 
 func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 	chain.MapHandle = make(map[string]Handler)
+	if settings.Api == nil || settings.Api.Endpoints == nil {
+		return
+	}
+
 	for _, endpoint := range settings.Api.Endpoints {
 
 		var firstHandler = new(HttpFirstHandler)
