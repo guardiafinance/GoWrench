@@ -106,8 +106,14 @@ actions:
   - id: post_sns
     type: snsPublish
     sns:
-      topicArn: 'http://localhost:{{PORT}}/api/mock'
-      groupId: "{{wrenchContext.request.headers.partner-key}}"
+      topicArn: 'arn:aws:sns:us-east-1:864899843511:test-sns'
+      filters: 
+        - "customerId:{{bodyContext.customerId}}"
+        - "partnerKey:{{wrenchContext.request.headers.partner-key}}"
+        - "test:tes1"
+      # fifo:
+      #   groupId: "{{wrenchContext.request.headers.partner-key}}"
+      #   dedupId: "{{wrenchContext.request.headers.partner-key}}"
         
 contract:
   maps:

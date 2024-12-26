@@ -6,38 +6,24 @@ import (
 )
 
 type SnsSettings struct {
-	TopicArn        string            `yaml:"topicArn"`
-	GroupId         string            `yaml:"groupId"`
-	MapHeaders      []string          `yaml:"mapHeaders"`
-	MapFixedHeaders map[string]string `yaml:"mapFixedHeaders"`
+	TopicArn string        `yaml:"topicArn"`
+	Fifo     *FifoSettings `yaml:"fifo"`
+	Filters  []string      `yaml:"filters"`
+}
+
+func (settings *SnsSettings) IsFifo() bool {
+	return strings.HasSuffix(settings.TopicArn, ".fifo")
 }
 
 func (setting SnsSettings) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
-	if setting.MapFixedHeaders != nil {
-		for _, mapHeader := range setting.MapFixedHeaders {
-			mapSplitted := strings.Split(mapHeader, ":")
-			if len(mapSplitted) != 2 {
-				result.AddError("actions.sns.mapFixedHeaders invalid")
-			}
-			if len(mapSplitted[0]) == 0 {
-				result.AddError("actions.sns.mapFixedHeaders header key is required")
-			}
-		}
+	if setting.Fifo != nil && setting.IsFifo() {
+		result.AddError("actions.sns.fifo can't be configured when topic isn't fifo")
 	}
 
-	if setting.MapHeaders != nil {
-		for _, mapHeader := range setting.MapHeaders {
-			mapSplitted := strings.Split(mapHeader, ":")
-			if len(mapSplitted) > 2 {
-				result.AddError("actions.sns.MapHeaders should contains only one splitter ':'")
-			}
-
-			if len(mapHeader) == 0 {
-				result.AddError("actions.sns.mapHeaders itens can't contains empty values")
-			}
-		}
+	if setting.IsFifo() && setting.Fifo == nil {
+		result.AddError("actions.sns.fifo should be configured when topic is fifo")
 	}
 
 	return result
