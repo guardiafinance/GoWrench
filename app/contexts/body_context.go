@@ -68,3 +68,7 @@ func (bodyContext *BodyContext) SetArrayMapObject(arrayJsonMap []map[string]inte
 	jsonArray, _ := json.Marshal(arrayJsonMap)
 	bodyContext.BodyByteArray = jsonArray
 }
+
+func (bodyContext *BodyContext) GetBodyString() string {
+	return string(bodyContext.BodyByteArray)
+}

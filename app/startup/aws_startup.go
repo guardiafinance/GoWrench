@@ -20,14 +20,20 @@ func LoadAwsSecrets(fileConfig []byte) {
 	}
 
 	setting := applicationSetting.Aws
-	if setting.AwsSecretSettings != nil &&
+	if setting != nil &&
+		setting.AwsSecretSettings != nil &&
 		len(setting.AwsSecretSettings.SecretsName) > 0 {
 		for _, secretName := range setting.AwsSecretSettings.SecretsName {
+			log.Print("Loading secret " + secretName)
 			secretValue := getSecretValue(setting.Region, secretName)
+			if secretValue == "" {
+				continue
+			}
 			secretMap, err := parseSecretToMap(secretValue)
 			if err == nil {
 				setMapToEnv(secretName, secretMap)
 			}
+			log.Print("Loaded secret " + secretName)
 		}
 	}
 }
@@ -47,6 +53,7 @@ func getSecretValue(region string, secretName string) string {
 	result, err := svc.GetSecretValue(context.TODO(), input)
 	if err != nil {
 		log.Print(err.Error())
+		return ""
 	}
 
 	var secretString string = *result.SecretString

@@ -4,11 +4,11 @@ service:
   name: "{{SERVICE_NAME}}"
   version: 1.0.0
 
-aws:
-  region: us-east-1
-  secret:
-    secretsName:
-    - "auth-keycloak"
+# aws:
+#   region: us-east-1
+#   secret:
+#     secretsName:
+#     - "auth-keycloak"
     
 # tokenCredentials:
 #   - id: auth_client
@@ -34,6 +34,10 @@ api:
     - route: /api/hellos
       method: get
       actionId: get_hello
+
+    - route: /api/sns
+      method: post
+      actionId: post_sns
 
 actions:
   - id: post_customer_mock
@@ -99,26 +103,17 @@ actions:
         url: 'http://localhost:5250/hello'
 
 
-  - id: get_customer
-    type: sqsPublish
-    sqs:
-      publish:
-        #insecure: true
-        topic: 'http://localhost:{{PORT}}/api/mock'
-        mapRequestHeaders:
-          - "mock1"
-          - "mock2:change2"
-        mapFixedHeaders:
-          "req1": "value1"
-          "req2": "value2"
-      response:
-        mapResponseHeaders:
-          - "mock1"
-          - "mock2:change2"
-        mapFixedHeaders:
-          "resp1": "value1"
-          "resp2": "value2"
-
+  - id: post_sns
+    type: snsPublish
+    sns:
+      topicArn: 'arn:aws:sns:us-east-1:864899843511:test-sns'
+      filters: 
+        - "customerId:{{bodyContext.customerId}}"
+        - "partnerKey:{{wrenchContext.request.headers.partner-key}}"
+        - "test:tes1"
+      # fifo:
+      #   groupId: "{{wrenchContext.request.headers.partner-key}}"
+      #   dedupId: "{{wrenchContext.request.headers.partner-key}}"
         
 contract:
   maps:

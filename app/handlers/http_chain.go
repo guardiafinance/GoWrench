@@ -55,6 +55,13 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 			currentHandler = httpRequestMockHadler
 		}
 
+		if action.Type == action_settings.ActionTypeSnsPublish {
+			snsPublishHandler := new(SnsPublishHandler)
+			snsPublishHandler.ActionSettings = action
+			currentHandler.SetNext(snsPublishHandler)
+			currentHandler = snsPublishHandler
+		}
+
 		if action.Trigger != nil && action.Trigger.After != nil {
 			httpContractMapHandler := new(HttpContractMapHandler)
 
