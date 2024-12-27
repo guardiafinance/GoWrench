@@ -12,6 +12,9 @@ type EndpointSettings struct {
 	ActionID        string           `yaml:"actionId"`
 	FlowActionID    string           `yaml:"flowActionId"`
 	EnableAnonymous bool             `yaml:"enableAnonymous"`
+	Roles           []string         `yaml:"roles"`
+	Scopes          []string         `yaml:"scopes"`
+	Claims          []string         `yaml:"claims"`
 }
 
 func (setting EndpointSettings) ShouldConfigureAuthorization(apiHasAuthorization bool) bool {

@@ -8,14 +8,15 @@ import (
 	"fmt"
 	"net/url"
 	"time"
+	"wrench/app/auth"
 	client "wrench/app/clients/http"
 	"wrench/app/manifest/application_settings"
 	credential "wrench/app/manifest/token_credential_settings"
 )
 
-var tokenCredentials map[string]*JwtData
+var tokenCredentials map[string]*auth.JwtData
 
-func GetTokenCredentialById(tokenCredentialId string) *JwtData {
+func GetTokenCredentialById(tokenCredentialId string) *auth.JwtData {
 	if tokenCredentials == nil {
 		return nil
 	}
@@ -28,7 +29,7 @@ func LoadTokenCredentialAuthentication() {
 
 	if len(app_settings.TokenCredentials) > 0 {
 		if tokenCredentials == nil {
-			tokenCredentials = make(map[string]*JwtData)
+			tokenCredentials = make(map[string]*auth.JwtData)
 		}
 
 		for {
@@ -65,7 +66,7 @@ func LoadTokenCredentialAuthentication() {
 	}
 }
 
-func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (*JwtData, error) {
+func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (*auth.JwtData, error) {
 	request := new(client.HttpClientRequestData)
 	data := url.Values{}
 	data.Set("client_id", setting.ClientCredential.ClientId)
@@ -89,7 +90,7 @@ func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (
 		if response.StatusCodeSuccess() {
 			token := string(response.Body)
 			tokenArray := []byte(token)
-			jwtData := new(JwtData)
+			jwtData := new(auth.JwtData)
 
 			jsonErr := json.Unmarshal(tokenArray, &jwtData)
 			if jsonErr != nil {
@@ -103,7 +104,7 @@ func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (
 	}
 }
 
-func basicCredentials(setting *credential.TokenCredentialSetting) (*JwtData, error) {
+func basicCredentials(setting *credential.TokenCredentialSetting) (*auth.JwtData, error) {
 	request := new(client.HttpClientRequestData)
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
@@ -130,7 +131,7 @@ func basicCredentials(setting *credential.TokenCredentialSetting) (*JwtData, err
 		if response.StatusCodeSuccess() {
 			token := string(response.Body)
 			tokenArray := []byte(token)
-			jwtData := new(JwtData)
+			jwtData := new(auth.JwtData)
 
 			jsonErr := json.Unmarshal(tokenArray, &jwtData)
 			if jsonErr != nil {

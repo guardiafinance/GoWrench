@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"wrench/app/auth"
 	handler "wrench/app/handlers"
 	"wrench/app/manifest/api_settings"
 	"wrench/app/manifest/application_settings"
-	"wrench/app/wjwt"
 
 	"github.com/gorilla/mux"
 )
@@ -36,7 +36,7 @@ func LoadApiEndpoint() *mux.Router {
 		shouldConfigureAuthorization := endpoint.ShouldConfigureAuthorization(hasAuthorization)
 
 		if shouldConfigureAuthorization {
-			r.Handle(route, authMiddleware(app.Api.Authorization, http.HandlerFunc(delegate.HttpHandler))).Methods(method)
+			r.Handle(route, authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler))).Methods(method)
 		} else {
 			r.HandleFunc(route, delegate.HttpHandler).Methods(method)
 		}
@@ -56,24 +56,32 @@ func LoadApiEndpoint() *mux.Router {
 	return r
 }
 
-func authMiddleware(authorizationSettings *api_settings.AuthorizationSettings, next http.Handler) http.Handler {
+func authMiddleware(authorizationSettings *api_settings.AuthorizationSettings, endpoint api_settings.EndpointSettings, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		tokenString := r.Header.Get("Authorization")
 		if len(tokenString) == 0 {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Missing Authorization Header"))
+			w.Write([]byte("Unauthorized"))
 			return
 		}
 		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
 
 		if authorizationSettings.Type == api_settings.JWKSAuthorizationType {
-			tokenIsValid := wjwt.JwksValidationAuthentication(tokenString, authorizationSettings)
-			if tokenIsValid == false {
+			tokenIsValid := auth.JwksValidationAuthentication(tokenString, authorizationSettings)
+			if tokenIsValid {
+				tokenIsAuthorized := auth.JwksValidationAuthorization(tokenString, endpoint.Roles, endpoint.Scopes, endpoint.Claims)
+				if tokenIsAuthorized == false {
+					w.WriteHeader(http.StatusForbidden)
+					w.Write([]byte("Forbidden"))
+					return
+				}
+			} else {
 				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte("Unauthorization"))
+				w.Write([]byte("Unauthorized"))
 				return
 			}
+
 		}
 
 		next.ServeHTTP(w, r)

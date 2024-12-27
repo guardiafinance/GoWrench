@@ -38,6 +38,12 @@ api:
       method: post
       #enableAnonymous: true
       actionId: post_customer
+      roles:
+      - write:pix-transaction
+      scopes:
+      - write:pix-transaction
+      claims:
+      - "provider:D3"
       
     - route: /api/hellos
       method: get
