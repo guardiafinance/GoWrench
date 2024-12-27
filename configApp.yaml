@@ -18,9 +18,16 @@ service:
 #     clientSecret: "{{KEYCLOCK_AUTH_CLIENT_SECRET}}"
 
 api:
+  authorization:
+    algorithm: RS256
+    kid: "8GVJUug3bEnolN40OafuqQnhKDwt4BLKPvHQgw7nRLI"
+    type: jwks
+    jwksUrl: '{{API_SECURITY_KEYCLOAK_JWKS}}'
+
   endpoints:
     - route: /api/mock
       method: post
+      enableAnonymous: true
       actionId: post_customer_mock
 
     - route: /api/customer
@@ -29,7 +36,14 @@ api:
 
     - route: /api/customer
       method: post
+      #enableAnonymous: true
       actionId: post_customer
+      roles:
+      - write:pix-transaction
+      scopes:
+      - write:pix-transaction
+      claims:
+      - "provider:D3"
       
     - route: /api/hellos
       method: get

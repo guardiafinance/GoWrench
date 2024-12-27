@@ -1,4 +1,4 @@
-package token_credentials
+package auth
 
 import (
 	"encoding/base64"
@@ -22,7 +22,7 @@ func (jwt *JwtData) LoadJwtPayload() {
 	if len(jwt.AccessToken) > 0 {
 		jwtArray := strings.Split(jwt.AccessToken, ".")
 		payloadBase64 := jwtArray[1]
-		jwt.jwtPaylodData = convertJwtPayloadBase64ToJwtPaylodData(payloadBase64)
+		jwt.jwtPaylodData = ConvertJwtPayloadBase64ToJwtPaylodData(payloadBase64)
 	}
 }
 
@@ -51,7 +51,7 @@ func (jwt *JwtData) IsExpired(lessTimeMinutes float64, isOpaque bool) bool {
 	}
 }
 
-func convertJwtPayloadBase64ToJwtPaylodData(jwtPayload string) map[string]interface{} {
+func ConvertJwtPayloadBase64ToJwtPaylodData(jwtPayload string) map[string]interface{} {
 	jwtPayload = strings.ReplaceAll(jwtPayload, "-", "+")
 	jwtPayload = strings.ReplaceAll(jwtPayload, "_", "/")
 	switch len(jwtPayload) % 4 {

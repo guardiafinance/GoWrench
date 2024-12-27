@@ -6,7 +6,12 @@ import (
 )
 
 type ApiSettings struct {
-	Endpoints []EndpointSettings `yaml:"endpoints"`
+	Endpoints     []EndpointSettings     `yaml:"endpoints"`
+	Authorization *AuthorizationSettings `yaml:"authorization"`
+}
+
+func (setting ApiSettings) HasAuthorization() bool {
+	return setting.Authorization != nil
 }
 
 func (setting ApiSettings) GetEndpointByRoute(route string) (*EndpointSettings, error) {
@@ -28,6 +33,10 @@ func (setting ApiSettings) Valid() validation.ValidateResult {
 		for _, validable := range setting.Endpoints {
 			result.AppendValidable(validable)
 		}
+	}
+
+	if setting.Authorization != nil {
+		result.AppendValidable(setting.Authorization)
 	}
 
 	return result
