@@ -18,7 +18,7 @@ func (httpFirst *HttpFirstHandler) Do(ctx context.Context, wrenchContext *contex
 		wrenchContext.SetHasError()
 	}
 
-	bodyContext.BodyArray = body
+	bodyContext.BodyByteArray = body
 	bodyContext.ContentType = "application/json"
 
 	if httpFirst.Next != nil {

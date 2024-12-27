@@ -1,4 +1,4 @@
-package token_credentials
+package auth
 
 import (
 	"encoding/base64"
@@ -9,11 +9,11 @@ import (
 )
 
 type JwtData struct {
-	AccessToken      string `json:"access_token"`
-	ExpiresIn        int    `json:"expires_in"`
-	RefreshExpiresIn int    `json:"refresh_expires_in"`
-	TokenType        string `json:"token_type"`
-	Scope            string `json:"scope"`
+	AccessToken      string  `json:"access_token"`
+	ExpiresIn        float64 `json:"expires_in"`
+	RefreshExpiresIn int     `json:"refresh_expires_in"`
+	TokenType        string  `json:"token_type"`
+	Scope            string  `json:"scope"`
 
 	jwtPaylodData map[string]interface{}
 }
@@ -22,15 +22,21 @@ func (jwt *JwtData) LoadJwtPayload() {
 	if len(jwt.AccessToken) > 0 {
 		jwtArray := strings.Split(jwt.AccessToken, ".")
 		payloadBase64 := jwtArray[1]
-		jwt.jwtPaylodData = convertJwtPayloadBase64ToJwtPaylodData(payloadBase64)
+		jwt.jwtPaylodData = ConvertJwtPayloadBase64ToJwtPaylodData(payloadBase64)
 	}
 }
 
-func (jwt *JwtData) IsExpired(lessTimeMinutes float64) bool {
+func (jwt *JwtData) IsExpired(lessTimeMinutes float64, isOpaque bool) bool {
 
-	exp, ok := jwt.jwtPaylodData["exp"].(float64)
-	if !ok {
-		return true
+	var exp float64
+	var ok bool
+	if isOpaque == false {
+		exp, ok = jwt.jwtPaylodData["exp"].(float64)
+		if !ok {
+			return true
+		}
+	} else {
+		exp = jwt.ExpiresIn
 	}
 
 	lessTimes := -time.Duration(lessTimeMinutes) * time.Minute
@@ -45,7 +51,7 @@ func (jwt *JwtData) IsExpired(lessTimeMinutes float64) bool {
 	}
 }
 
-func convertJwtPayloadBase64ToJwtPaylodData(jwtPayload string) map[string]interface{} {
+func ConvertJwtPayloadBase64ToJwtPaylodData(jwtPayload string) map[string]interface{} {
 	jwtPayload = strings.ReplaceAll(jwtPayload, "-", "+")
 	jwtPayload = strings.ReplaceAll(jwtPayload, "_", "/")
 	switch len(jwtPayload) % 4 {

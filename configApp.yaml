@@ -4,6 +4,12 @@ service:
   name: "{{SERVICE_NAME}}"
   version: 1.0.0
 
+# aws:
+#   region: us-east-1
+#   secret:
+#     secretsName:
+#     - "auth-keycloak"
+    
 # tokenCredentials:
 #   - id: auth_client
 #     type: clientCredentials
@@ -12,9 +18,16 @@ service:
 #     clientSecret: "{{KEYCLOCK_AUTH_CLIENT_SECRET}}"
 
 api:
+  authorization:
+    algorithm: RS256
+    kid: "8GVJUug3bEnolN40OafuqQnhKDwt4BLKPvHQgw7nRLI"
+    type: jwks
+    jwksUrl: '{{API_SECURITY_KEYCLOAK_JWKS}}'
+
   endpoints:
     - route: /api/mock
       method: post
+      enableAnonymous: true
       actionId: post_customer_mock
 
     - route: /api/customer
@@ -23,11 +36,22 @@ api:
 
     - route: /api/customer
       method: post
+      #enableAnonymous: true
       actionId: post_customer
+      roles:
+      - write:pix-transaction
+      scopes:
+      - write:pix-transaction
+      claims:
+      - "provider:D3"
       
     - route: /api/hellos
       method: get
       actionId: get_hello
+
+    - route: /api/sns
+      method: post
+      actionId: post_sns
 
 actions:
   - id: post_customer_mock
@@ -92,6 +116,18 @@ actions:
         # tokenCredentialId: auth_client
         url: 'http://localhost:5250/hello'
 
+
+  - id: post_sns
+    type: snsPublish
+    sns:
+      topicArn: 'arn:aws:sns:us-east-1:864899843511:test-sns'
+      filters: 
+        - "customerId:{{bodyContext.customerId}}"
+        - "partnerKey:{{wrenchContext.request.headers.partner-key}}"
+        - "test:tes1"
+      # fifo:
+      #   groupId: "{{wrenchContext.request.headers.partner-key}}"
+      #   dedupId: "{{wrenchContext.request.headers.partner-key}}"
         
 contract:
   maps:

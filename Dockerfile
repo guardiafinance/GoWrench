@@ -10,9 +10,10 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o whrenchapp ./app/cmd
 
 FROM alpine
 
-RUN addgroup -S nonroot && adduser -S nonroot -G nonroot
-USER nonroot
+# Comentado devido a necessidade de execucao com o usuario root
+# RUN addgroup -S nonroot && adduser -S nonroot -G nonroot
+# USER nonroot
 
 COPY --from=build /app/whrenchapp /
-
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 ENTRYPOINT [ "/whrenchapp" ]

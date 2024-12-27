@@ -18,6 +18,10 @@ func (chain *Chain) GetStatic() *Chain {
 
 func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 	chain.MapHandle = make(map[string]Handler)
+	if settings.Api == nil || settings.Api.Endpoints == nil {
+		return
+	}
+
 	for _, endpoint := range settings.Api.Endpoints {
 
 		var firstHandler = new(HttpFirstHandler)
@@ -53,6 +57,13 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 			httpRequestMockHadler.ActionSettings = action
 			currentHandler.SetNext(httpRequestMockHadler)
 			currentHandler = httpRequestMockHadler
+		}
+
+		if action.Type == action_settings.ActionTypeSnsPublish {
+			snsPublishHandler := new(SnsPublishHandler)
+			snsPublishHandler.ActionSettings = action
+			currentHandler.SetNext(snsPublishHandler)
+			currentHandler = snsPublishHandler
 		}
 
 		if action.Trigger != nil && action.Trigger.After != nil {

@@ -7,10 +7,18 @@ import (
 )
 
 type EndpointSettings struct {
-	Route        string           `yaml:"route"`
-	Method       types.HttpMethod `yaml:"method"`
-	ActionID     string           `yaml:"actionId"`
-	FlowActionID string           `yaml:"flowActionId"`
+	Route           string           `yaml:"route"`
+	Method          types.HttpMethod `yaml:"method"`
+	ActionID        string           `yaml:"actionId"`
+	FlowActionID    string           `yaml:"flowActionId"`
+	EnableAnonymous bool             `yaml:"enableAnonymous"`
+	Roles           []string         `yaml:"roles"`
+	Scopes          []string         `yaml:"scopes"`
+	Claims          []string         `yaml:"claims"`
+}
+
+func (setting EndpointSettings) ShouldConfigureAuthorization(apiHasAuthorization bool) bool {
+	return apiHasAuthorization && !setting.EnableAnonymous
 }
 
 func (setting EndpointSettings) Valid() validation.ValidateResult {
