@@ -68,7 +68,12 @@ func authMiddleware(authorizationSettings *api_settings.AuthorizationSettings, n
 		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
 
 		if authorizationSettings.Type == api_settings.JWKSAuthorizationType {
-			wjwt.JwksValidation(tokenString, authorizationSettings)
+			tokenIsValid := wjwt.JwksValidationAuthentication(tokenString, authorizationSettings)
+			if tokenIsValid == false {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte("Unauthorization"))
+				return
+			}
 		}
 
 		next.ServeHTTP(w, r)

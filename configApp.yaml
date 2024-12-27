@@ -36,7 +36,7 @@ api:
 
     - route: /api/customer
       method: post
-      enableAnonymous: true
+      #enableAnonymous: true
       actionId: post_customer
       
     - route: /api/hellos

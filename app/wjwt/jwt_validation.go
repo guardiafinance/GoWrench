@@ -3,54 +3,47 @@ package wjwt
 import (
 	"context"
 	"log"
-	client "wrench/app/clients/http"
 	"wrench/app/manifest/api_settings"
 
-	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/MicahParks/keyfunc"
+	"github.com/golang-jwt/jwt/v4"
 )
 
-var jwksData jwk.Set
+var jwksData *keyfunc.JWKS
 
-func JwksValidation(tokenString string, authorizationSettings *api_settings.AuthorizationSettings) {
+func JwksValidationAuthentication(tokenString string, authorizationSettings *api_settings.AuthorizationSettings) bool {
 	LoadCertificates(authorizationSettings.JwksUrl)
 
-	_, err = jws.VerifyWithJWKSet([]byte(tokenString), jwksData, nil)
+	token, err := jwt.Parse(tokenString, jwksData.Keyfunc)
+	if err != nil {
+		log.Printf("Failed to parse the JWT.\nError: %s", err.Error())
+		return false
+	}
+
+	// Check if the token is valid.
+	if !token.Valid {
+		log.Println("The token is not valid.")
+	}
+	log.Println("The token is valid.")
+	return token.Valid
 }
 
 func LoadCertificates(jwksUrl string) {
+
 	if jwksData == nil {
-
 		ctx := context.Background()
-		request := new(client.HttpClientRequestData)
-		request.Method = "GET"
-		request.Url = jwksUrl
-		response, err := client.HttpClientDo(ctx, request)
-		if err != nil {
-			log.Print(err)
-		}
 
-		jwks, err := jwk.Parse(response.Body)
+		options := keyfunc.Options{
+			Ctx: ctx,
+			RefreshErrorHandler: func(err error) {
+				log.Printf("There was an error with the jwt.Keyfunc\nError: %s", err.Error())
+			},
+		}
+		jwks, err := keyfunc.Get(jwksUrl, options)
 		if err != nil {
-			panic(err)
+			log.Fatalf("Failed to create JWKS from resource at the given URL.\nError: %s", err.Error())
 		}
 
 		jwksData = jwks
 	}
 }
-
-// func (jwks *JwksData) GetCertificateByKid(kid string) *CertificateData {
-// 	if len(jwks.Certificates) == 0 {
-// 		return nil
-// 	}
-
-// 	var certificate *CertificateData
-
-// 	for _, cert := range jwks.Certificates {
-// 		if cert.Kid == kid {
-// 			certificate = cert
-// 			break
-// 		}
-// 	}
-
-// 	return certificate
-// }
