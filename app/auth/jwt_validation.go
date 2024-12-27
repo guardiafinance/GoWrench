@@ -121,7 +121,7 @@ func JwksValidationAuthentication(tokenString string, authorizationSettings *api
 	if !token.Valid {
 		log.Println("The token is not valid.")
 	}
-	log.Println("The token is valid.")
+
 	return token.Valid
 }
 
