@@ -21,13 +21,17 @@ service:
 tokenCredentials:
   - id: custom_client
     type: custom_authentication
-    authEndpoint: "{{AUTH_URL_PARTNER}}"
+    authEndpoint: "{{FISER_APPS_URL}}"
     forceReload: 3600s
     custom:
+      method: post
+      requestHeaders:
+        Content-Type: application/json
+        Api-Key: "{{FISER_API_KEY}}"
       requestBody:
-        application.secretTransferEncoding": "base64"
-        application.id: ""
-        application.secret: ""
+        application.secretTransferEncoding: "base64"
+        application.id: "{{FISER_APP_ID}}"
+        application.secret: "{{FISER_APP_SECRET}}"
       configs:
         token: "token[0].value"
 
