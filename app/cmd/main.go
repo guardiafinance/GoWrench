@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
@@ -16,8 +18,8 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-	otel.LogProvider(ctx)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
 
 	loadBashFiles()
 
@@ -40,9 +42,23 @@ func main() {
 
 	go token_credentials.LoadTokenCredentialAuthentication()
 	var router = startup.LoadApplicationSettings(applicationSetting)
+	loadOtel(ctx)
 	port := getPort()
-	log.Print(fmt.Sprintf("Server listen in port %s", port))
+	log.Printf("Server listen in port %s", port)
+
 	http.ListenAndServe(port, router)
+}
+
+func loadOtel(ctx context.Context) {
+	// Set up OpenTelemetry.
+	otelShutdown, err := otel.SetupOTelSDK(ctx)
+	if err != nil {
+		return
+	}
+	// Handle shutdown properly so nothing leaks.
+	defer func() {
+		err = errors.Join(err, otelShutdown(context.Background()))
+	}()
 }
 
 func loadBashFiles() {
