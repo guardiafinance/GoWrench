@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"wrench/app/json_map"
 )
 
 type TokenData struct {
@@ -23,7 +24,7 @@ type TokenData struct {
 }
 
 func (token *TokenData) LoadJwtPayload() {
-	if len(token.AccessToken) > 0 {
+	if len(token.AccessToken) > 0 && !token.IsNotJwt {
 		jwtArray := strings.Split(token.AccessToken, ".")
 		payloadBase64 := jwtArray[1]
 		token.jwtPaylodData = ConvertJwtPayloadBase64ToJwtPaylodData(payloadBase64)
@@ -55,11 +56,14 @@ func (token *TokenData) IsExpired(lessTimeMinutes float64, isOpaque bool) bool {
 	}
 }
 
-func (token *TokenData) LoadCustomToken(forceReloadSeconds int64) {
+func (token *TokenData) LoadCustomToken(forceReloadSeconds int64, accessTokenPropertyName string, tokenType string) {
 	token.IsNotJwt = true
 	token.ForceReloadSeconds = forceReloadSeconds
 	var now = time.Now().UTC().Add(time.Second * time.Duration(token.ForceReloadSeconds))
 	token.ExpiresIn = float64(now.Unix())
+	accessToken, _ := json_map.GetValue(token.CustomToken, accessTokenPropertyName, false)
+	token.AccessToken = accessToken
+	token.TokenType = tokenType
 }
 
 func ConvertJwtPayloadBase64ToJwtPaylodData(jwtPayload string) map[string]interface{} {

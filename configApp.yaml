@@ -33,7 +33,8 @@ tokenCredentials:
         application.id: "{{FISER_APP_ID}}"
         application.secret: "{{FISER_APP_SECRET}}"
       configs:
-        token: "token[0].value"
+        accessTokenPropertyName: "tokens[0].value"
+        tokenType: "Bearer"
 
 api:
   authorization:

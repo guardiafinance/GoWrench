@@ -6,7 +6,8 @@ import (
 )
 
 type CustomAuthenticationConfigurations struct {
-	Token string `yaml:"token"`
+	AccessTokenPropertyName string `yaml:"accessTokenPropertyName"`
+	TokenType               string `yaml:"tokenType"`
 }
 
 type CustomAuthentication struct {
@@ -19,8 +20,8 @@ type CustomAuthentication struct {
 func (setting CustomAuthentication) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
-	if len(setting.Configs.Token) == 0 {
-		result.AddError("tokenCredentials.custom_authentication.custom.configs.token is required")
+	if len(setting.Configs.AccessTokenPropertyName) == 0 {
+		result.AddError("tokenCredentials.custom_authentication.custom.configs.AccessTokenPropertyName is required")
 	}
 
 	if len(setting.Method) == 0 {

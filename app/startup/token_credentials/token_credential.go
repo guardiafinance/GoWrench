@@ -37,7 +37,7 @@ func LoadTokenCredentialAuthentication() {
 
 				tokenData := GetTokenCredentialById(setting.Id)
 				if tokenData != nil {
-					if tokenData.IsExpired(5, setting.IsOpaque) == false {
+					if !tokenData.IsExpired(5, setting.IsOpaque) {
 						continue
 					}
 				}
@@ -56,7 +56,7 @@ func LoadTokenCredentialAuthentication() {
 					// TODO setting error to unhealthy api
 				}
 
-				if setting.IsOpaque == false {
+				if !setting.IsOpaque {
 					tokenData.LoadJwtPayload()
 				}
 
@@ -166,12 +166,15 @@ func customAuthentication(setting *credential.TokenCredentialSetting) (*auth.Tok
 
 		if response.StatusCodeSuccess() {
 			tokenData := new(auth.TokenData)
-			tokenData.LoadCustomToken(setting.GetForceReloadTimeSecondsValue())
-			jsonErr := json.Unmarshal(response.Body, &tokenData.CustomToken)
 
+			jsonErr := json.Unmarshal(response.Body, &tokenData.CustomToken)
 			if jsonErr != nil {
 				return nil, jsonErr
 			}
+
+			tokenData.LoadCustomToken(setting.GetForceReloadTimeSecondsValue(),
+				setting.Custom.Configs.AccessTokenPropertyName,
+				setting.Custom.Configs.TokenType)
 
 			return tokenData, nil
 		}
