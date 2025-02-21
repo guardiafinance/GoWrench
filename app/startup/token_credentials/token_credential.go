@@ -45,8 +45,11 @@ func LoadTokenCredentialAuthentication() {
 				var err error
 				if setting.Type == credential.TokenCredentialClientCredential {
 					jwtData, err = authenticateClientCredentials(setting)
-				} else {
+				} else if setting.Type == credential.TokenCredentialBasicCredential {
 					jwtData, err = basicCredentials(setting)
+				} else if setting.Type == credential.TokenCredentialCustomAuthentication {
+					//jwtData, err = basicCredentials(setting)
+					continue
 				}
 
 				if err != nil {

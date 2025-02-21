@@ -12,10 +12,24 @@ service:
     
 # tokenCredentials:
 #   - id: auth_client
-#     type: clientCredentials
+#     type: client_credentials
 #     authEndpoint: "{{KEYCLOCK_AUTH_ENDPOINT}}"
-#     clientId: "{{KEYCLOCK_AUTH_CLIENT_ID}}"
-#     clientSecret: "{{KEYCLOCK_AUTH_CLIENT_SECRET}}"
+#     clientCredential:
+#       clientId: "{{KEYCLOCK_AUTH_CLIENT_ID}}"
+#       clientSecret: "{{KEYCLOCK_AUTH_CLIENT_SECRET}}"
+
+tokenCredentials:
+  - id: custom_client
+    type: custom_authentication
+    authEndpoint: "{{AUTH_URL_PARTNER}}"
+    forceReload: 3600s
+    custom:
+      requestBody:
+        application.secretTransferEncoding": "base64"
+        application.id: ""
+        application.secret: ""
+      configs:
+        token: "token[0].value"
 
 api:
   authorization:
