@@ -52,6 +52,16 @@ func (setting TokenCredentialSetting) GetForceReloadTimeValue() int64 {
 	return forceReloadTimeValue
 }
 
+func (setting TokenCredentialSetting) GetForceReloadTimeSecondsValue() int64 {
+	if setting.GetForceReloadTimeSelector() == "s" {
+		return setting.GetForceReloadTimeValue()
+	} else if setting.GetForceReloadTimeSelector() == "m" {
+		return setting.GetForceReloadTimeValue() * 60
+	} else {
+		return 3600
+	}
+}
+
 func (setting TokenCredentialSetting) Valid() validation.ValidateResult {
 	var result validation.ValidateResult
 
@@ -94,9 +104,13 @@ func (setting TokenCredentialSetting) Valid() validation.ValidateResult {
 				result.AddError("tokenCredentials.ForceReload should use 's' to seconds or 'm' to minutes. Ex: 60s or 1m")
 			}
 
-			timeValueInt := setting.GetForceReloadTimeValue()
+			timeValueInt := setting.GetForceReloadTimeSecondsValue()
 			if timeValueInt < 0 {
 				result.AddError("tokenCredentials.ForceReload should inform the int value to refresh token after the selector time. Ex: 60x or 1m")
+			} else {
+				if timeValueInt < 600 {
+					result.AddError("tokenCredentials.ForceReload should be greater than 600s or 10m")
+				}
 			}
 			result.AppendValidable(setting.Custom)
 		}

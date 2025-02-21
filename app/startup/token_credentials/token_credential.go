@@ -14,9 +14,9 @@ import (
 	credential "wrench/app/manifest/token_credential_settings"
 )
 
-var tokenCredentials map[string]*auth.JwtData
+var tokenCredentials map[string]*auth.TokenData
 
-func GetTokenCredentialById(tokenCredentialId string) *auth.JwtData {
+func GetTokenCredentialById(tokenCredentialId string) *auth.TokenData {
 	if tokenCredentials == nil {
 		return nil
 	}
@@ -29,27 +29,26 @@ func LoadTokenCredentialAuthentication() {
 
 	if len(app_settings.TokenCredentials) > 0 {
 		if tokenCredentials == nil {
-			tokenCredentials = make(map[string]*auth.JwtData)
+			tokenCredentials = make(map[string]*auth.TokenData)
 		}
 
 		for {
 			for _, setting := range app_settings.TokenCredentials {
 
-				jwtData := GetTokenCredentialById(setting.Id)
-				if jwtData != nil {
-					if jwtData.IsExpired(5, setting.IsOpaque) == false {
+				tokenData := GetTokenCredentialById(setting.Id)
+				if tokenData != nil {
+					if tokenData.IsExpired(5, setting.IsOpaque) == false {
 						continue
 					}
 				}
 
 				var err error
 				if setting.Type == credential.TokenCredentialClientCredential {
-					jwtData, err = authenticateClientCredentials(setting)
+					tokenData, err = authenticateClientCredentials(setting)
 				} else if setting.Type == credential.TokenCredentialBasicCredential {
-					jwtData, err = basicCredentials(setting)
+					tokenData, err = basicCredentials(setting)
 				} else if setting.Type == credential.TokenCredentialCustomAuthentication {
-					jwtData, err = customAuthentication(setting)
-					continue
+					tokenData, err = customAuthentication(setting)
 				}
 
 				if err != nil {
@@ -58,10 +57,10 @@ func LoadTokenCredentialAuthentication() {
 				}
 
 				if setting.IsOpaque == false {
-					jwtData.LoadJwtPayload()
+					tokenData.LoadJwtPayload()
 				}
 
-				tokenCredentials[setting.Id] = jwtData
+				tokenCredentials[setting.Id] = tokenData
 			}
 
 			time.Sleep(2 * time.Minute)
@@ -69,7 +68,7 @@ func LoadTokenCredentialAuthentication() {
 	}
 }
 
-func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (*auth.JwtData, error) {
+func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (*auth.TokenData, error) {
 	request := new(client.HttpClientRequestData)
 	data := url.Values{}
 	data.Set("client_id", setting.ClientCredential.ClientId)
@@ -91,23 +90,20 @@ func authenticateClientCredentials(setting *credential.TokenCredentialSetting) (
 	} else {
 
 		if response.StatusCodeSuccess() {
-			token := string(response.Body)
-			tokenArray := []byte(token)
-			jwtData := new(auth.JwtData)
-
-			jsonErr := json.Unmarshal(tokenArray, &jwtData)
+			tokenData := new(auth.TokenData)
+			jsonErr := json.Unmarshal(response.Body, &tokenData)
 			if jsonErr != nil {
 				return nil, jsonErr
 			}
 
-			return jwtData, nil
+			return tokenData, nil
 		}
 
 		return nil, fmt.Errorf("Can't get jwtToken response_status_code: %v", response.StatusCode)
 	}
 }
 
-func basicCredentials(setting *credential.TokenCredentialSetting) (*auth.JwtData, error) {
+func basicCredentials(setting *credential.TokenCredentialSetting) (*auth.TokenData, error) {
 	request := new(client.HttpClientRequestData)
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
@@ -132,23 +128,20 @@ func basicCredentials(setting *credential.TokenCredentialSetting) (*auth.JwtData
 	} else {
 
 		if response.StatusCodeSuccess() {
-			token := string(response.Body)
-			tokenArray := []byte(token)
-			jwtData := new(auth.JwtData)
-
-			jsonErr := json.Unmarshal(tokenArray, &jwtData)
+			tokenData := new(auth.TokenData)
+			jsonErr := json.Unmarshal(response.Body, &tokenData)
 			if jsonErr != nil {
 				return nil, jsonErr
 			}
 
-			return jwtData, nil
+			return tokenData, nil
 		}
 
 		return nil, fmt.Errorf("Can't get jwtToken response_status_code: %v", response.StatusCode)
 	}
 }
 
-func customAuthentication(setting *credential.TokenCredentialSetting) (*auth.JwtData, error) {
+func customAuthentication(setting *credential.TokenCredentialSetting) (*auth.TokenData, error) {
 	request := new(client.HttpClientRequestData)
 
 	if len(setting.Custom.RequestBody) > 0 {
@@ -164,7 +157,6 @@ func customAuthentication(setting *credential.TokenCredentialSetting) (*auth.Jwt
 	}
 
 	ctx := context.Background()
-
 	response, err := client.HttpClientDo(ctx, request)
 
 	if err != nil {
@@ -173,16 +165,15 @@ func customAuthentication(setting *credential.TokenCredentialSetting) (*auth.Jwt
 	} else {
 
 		if response.StatusCodeSuccess() {
-			token := string(response.Body)
-			tokenArray := []byte(token)
-			jwtData := new(auth.JwtData)
+			tokenData := new(auth.TokenData)
+			tokenData.LoadCustomToken(setting.GetForceReloadTimeSecondsValue())
+			jsonErr := json.Unmarshal(response.Body, &tokenData.CustomToken)
 
-			jsonErr := json.Unmarshal(tokenArray, &jwtData)
 			if jsonErr != nil {
 				return nil, jsonErr
 			}
 
-			return jwtData, nil
+			return tokenData, nil
 		}
 
 		return nil, fmt.Errorf("Can't get jwtToken response_status_code: %v", response.StatusCode)

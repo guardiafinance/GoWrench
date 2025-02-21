@@ -22,7 +22,7 @@ tokenCredentials:
   - id: custom_client
     type: custom_authentication
     authEndpoint: "{{FISER_APPS_URL}}"
-    forceReload: 3600s
+    forceReload: 10m
     custom:
       method: post
       requestHeaders:
