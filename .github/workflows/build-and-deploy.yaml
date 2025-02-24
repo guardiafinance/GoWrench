@@ -35,5 +35,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ivanmds2/wrenchgo:latest, ivanmds2/wrenchgo:${{ github.run_number }}
+          tags: wrenchapps/wrench:latest, wrenchapps/wrench:${{ github.run_number }}
     
