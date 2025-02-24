@@ -1,6 +1,8 @@
 package json_map
 
 import (
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 	"wrench/app/contexts"
@@ -23,15 +25,40 @@ func GetValue(jsonMap map[string]interface{}, propertyName string, deletePropert
 			continue
 		}
 
-		valueTempString, ok := jsonMapCurrent[property].(string)
-		if ok {
-			value = valueTempString
-
-			if deleteProperty {
-				delete(jsonMapCurrent, property)
+		match := regexp.MustCompile(`(\w+)\[(\d+)\]`).FindStringSubmatch(property)
+		if match != nil {
+			indexValueStringArray := strings.Split(property, "[")
+			indexValueStringFirst := indexValueStringArray[0]
+			indexValueStringLast := indexValueStringArray[1]
+			indexValueStringCut := indexValueStringLast[:len(indexValueStringLast)-1]
+			indexValue, _ := strconv.ParseInt(indexValueStringCut, 10, 0)
+			valueTempString, ok := jsonMapCurrent[indexValueStringFirst].([]interface{})
+			if ok {
+				propertyNameToArray := strings.ReplaceAll(propertyName, property, "")
+				item, ok2 := valueTempString[indexValue].(map[string]interface{})
+				if ok2 {
+					if string(propertyNameToArray[0]) == "." {
+						propertyNameToArray = propertyNameToArray[1:]
+						return GetValue(item, propertyNameToArray, false)
+					} else {
+						valueTempString, _ := jsonMapCurrent[property].(string)
+						value = valueTempString
+					}
+				}
+				break
 			}
+		} else {
 
-			break
+			valueTempString, ok := jsonMapCurrent[property].(string)
+			if ok {
+				value = valueTempString
+
+				if deleteProperty {
+					delete(jsonMapCurrent, property)
+				}
+
+				break
+			}
 		}
 	}
 	return value, jsonMap

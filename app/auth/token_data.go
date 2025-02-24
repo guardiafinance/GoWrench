@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"wrench/app/json_map"
 )
 
-type JwtData struct {
+type TokenData struct {
 	AccessToken      string  `json:"access_token"`
 	ExpiresIn        float64 `json:"expires_in"`
 	RefreshExpiresIn int     `json:"refresh_expires_in"`
@@ -16,27 +17,31 @@ type JwtData struct {
 	Scope            string  `json:"scope"`
 
 	jwtPaylodData map[string]interface{}
+	CustomToken   map[string]interface{}
+
+	ForceReloadSeconds int64
+	IsNotJwt           bool
 }
 
-func (jwt *JwtData) LoadJwtPayload() {
-	if len(jwt.AccessToken) > 0 {
-		jwtArray := strings.Split(jwt.AccessToken, ".")
+func (token *TokenData) LoadJwtPayload() {
+	if len(token.AccessToken) > 0 && !token.IsNotJwt {
+		jwtArray := strings.Split(token.AccessToken, ".")
 		payloadBase64 := jwtArray[1]
-		jwt.jwtPaylodData = ConvertJwtPayloadBase64ToJwtPaylodData(payloadBase64)
+		token.jwtPaylodData = ConvertJwtPayloadBase64ToJwtPaylodData(payloadBase64)
 	}
 }
 
-func (jwt *JwtData) IsExpired(lessTimeMinutes float64, isOpaque bool) bool {
-
+func (token *TokenData) IsExpired(lessTimeMinutes float64, isOpaque bool) bool {
 	var exp float64
 	var ok bool
-	if isOpaque == false {
-		exp, ok = jwt.jwtPaylodData["exp"].(float64)
+
+	if isOpaque || token.IsNotJwt {
+		exp = token.ExpiresIn
+	} else {
+		exp, ok = token.jwtPaylodData["exp"].(float64)
 		if !ok {
 			return true
 		}
-	} else {
-		exp = jwt.ExpiresIn
 	}
 
 	lessTimes := -time.Duration(lessTimeMinutes) * time.Minute
@@ -49,6 +54,16 @@ func (jwt *JwtData) IsExpired(lessTimeMinutes float64, isOpaque bool) bool {
 	} else {
 		return false
 	}
+}
+
+func (token *TokenData) LoadCustomToken(forceReloadSeconds int64, accessTokenPropertyName string, tokenType string) {
+	token.IsNotJwt = true
+	token.ForceReloadSeconds = forceReloadSeconds
+	var now = time.Now().UTC().Add(time.Second * time.Duration(token.ForceReloadSeconds))
+	token.ExpiresIn = float64(now.Unix())
+	accessToken, _ := json_map.GetValue(token.CustomToken, accessTokenPropertyName, false)
+	token.AccessToken = accessToken
+	token.TokenType = tokenType
 }
 
 func ConvertJwtPayloadBase64ToJwtPaylodData(jwtPayload string) map[string]interface{} {
