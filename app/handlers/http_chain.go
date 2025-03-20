@@ -66,6 +66,13 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 			currentHandler = snsPublishHandler
 		}
 
+		if action.Type == action_settings.ActionTypeFileReader {
+			fileReaderHandler := new(FileReaderHandler)
+			fileReaderHandler.ActionSettings = action
+			currentHandler.SetNext(fileReaderHandler)
+			currentHandler = fileReaderHandler
+		}
+
 		if action.Trigger != nil && action.Trigger.After != nil {
 			httpContractMapHandler := new(HttpContractMapHandler)
 
