@@ -20,6 +20,7 @@ func (httpFirst *HttpFirstHandler) Do(ctx context.Context, wrenchContext *contex
 
 	bodyContext.BodyByteArray = body
 	bodyContext.ContentType = "application/json"
+	bodyContext.HttpStatusCode = 200
 
 	if httpFirst.Next != nil {
 		httpFirst.Next.Do(ctx, wrenchContext, bodyContext)

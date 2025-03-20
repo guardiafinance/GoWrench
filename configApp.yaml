@@ -82,13 +82,13 @@ actions:
     type: fileReader
     file:
       path: ../.././test.json
-      response:
-        contentType: "application/json"
-        statusCode: 201
-        headers: 
-          "mock1": "value1"
-          "mock2": "value2"
-          "mock3": "value2"
+      # response:
+      #   contentType: "application/json"
+      #   statusCode: 201
+      #   headers: 
+      #     "mock1": "value1"
+      #     "mock2": "value2"
+      #     "mock3": "value2"
 
   - id: post_customer_mock
     type: httpRequestMock
