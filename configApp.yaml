@@ -37,11 +37,11 @@ tokenCredentials:
         tokenType: "Bearer"
 
 api:
-  authorization:
-    algorithm: RS256
-    kid: "8GVJUug3bEnolN40OafuqQnhKDwt4BLKPvHQgw7nRLI"
-    type: jwks
-    jwksUrl: '{{API_SECURITY_KEYCLOAK_JWKS}}'
+  # authorization:
+  #   algorithm: RS256
+  #   kid: "8GVJUug3bEnolN40OafuqQnhKDwt4BLKPvHQgw7nRLI"
+  #   type: jwks
+  #   jwksUrl: '{{API_SECURITY_KEYCLOAK_JWKS}}'
 
   endpoints:
     - route: /api/mock
@@ -72,7 +72,24 @@ api:
       method: post
       actionId: post_sns
 
+    - route: /api/json
+      method: get
+      actionId: read_json_file
+
 actions:
+
+  - id: read_json_file
+    type: fileReader
+    file:
+      path: ../.././test.json
+      response:
+        contentType: "application/json"
+        statusCode: 201
+        headers: 
+          "mock1": "value1"
+          "mock2": "value2"
+          "mock3": "value2"
+
   - id: post_customer_mock
     type: httpRequestMock
     http:
