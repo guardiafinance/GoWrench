@@ -44,25 +44,14 @@ func LoadApiEndpoint() *mux.Router {
 			initialPage.Append("Route: <i>" + route + "</i> Method: <i>" + method + "</i> <b>Not is proxy</b>")
 		} else {
 			initialPage.Append("Route: <i>" + endpoint.Route + "</i> <b> IS PROXY</b>")
+			if endpoint.Route == "/" {
+				endpoint.Route = ""
+			}
 
-			for _, proxyRoute := range getProxyEndpoints() {
-				if endpoint.Route == "/" {
-					endpoint.Route = ""
-				}
-
-				route := endpoint.Route
-				route = route + proxyRoute
-
-				for _, proxyMethod := range getProxyEndpointMethods() {
-					method := proxyMethod
-
-					if shouldConfigureAuthorization {
-						r.Handle(route, authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler))).Methods(method)
-					} else {
-						r.HandleFunc(route, delegate.HttpHandler).Methods(method)
-					}
-
-				}
+			if shouldConfigureAuthorization {
+				r.Handle(endpoint.Route+"/{path:.*}", authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler)))
+			} else {
+				r.HandleFunc(endpoint.Route+"/{path:.*}", delegate.HttpHandler)
 			}
 		}
 	}
@@ -109,29 +98,4 @@ func authMiddleware(authorizationSettings *api_settings.AuthorizationSettings, e
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func getProxyEndpoints() [10]string {
-	var endpoints [10]string
-	endpoints[0] = "/{r1}"
-	endpoints[1] = "/{r1}/{r2}"
-	endpoints[2] = "/{r1}/{r2}/{r3}"
-	endpoints[3] = "/{r1}/{r2}/{r3}/{r4}"
-	endpoints[4] = "/{r1}/{r2}/{r3}/{r4}/{r5}"
-	endpoints[5] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}"
-	endpoints[6] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}"
-	endpoints[7] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}"
-	endpoints[8] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}/{r9}"
-	endpoints[9] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}/{r9}/{r10}"
-	return endpoints
-}
-
-func getProxyEndpointMethods() [5]string {
-	var methods [5]string
-	methods[0] = "GET"
-	methods[1] = "POST"
-	methods[2] = "PUT"
-	methods[3] = "PATCH"
-	methods[4] = "DELETE"
-	return methods
 }
