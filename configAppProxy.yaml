@@ -6,7 +6,7 @@ service:
 
 api:
   endpoints:
-    - route: '/'
+    - route: '/jsons'
       isProxy: true
       actionId: action_proxy
 
