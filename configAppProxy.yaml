@@ -16,4 +16,4 @@ actions:
     http:
       request:
         #insecure: true
-        url: 'https://acquirer-jsons.snb.55tech.com.br/'
+        url: 'https://acquirer-jsons.snb.55tech.com.br'

@@ -32,7 +32,7 @@ func LoadApiEndpoint() *mux.Router {
 		var delegate = new(handler.RequestDelegate)
 		delegate.SetEndpoint(&endpoint)
 
-		if endpoint.IsProxy {
+		if !endpoint.IsProxy {
 			method := strings.ToUpper(string(endpoint.Method))
 			route := endpoint.Route
 
@@ -43,8 +43,16 @@ func LoadApiEndpoint() *mux.Router {
 			}
 			initialPage.Append("Route: <i>" + route + "</i> Method: <i>" + method + "</i> <b>Not is proxy</b>")
 		} else {
+			initialPage.Append("Route: <i>" + endpoint.Route + "</i> <b> IS PROXY</b>")
+
 			for _, proxyRoute := range getProxyEndpoints() {
-				route := proxyRoute
+				if endpoint.Route == "/" {
+					endpoint.Route = ""
+				}
+
+				route := endpoint.Route
+				route = route + proxyRoute
+
 				for _, proxyMethod := range getProxyEndpointMethods() {
 					method := proxyMethod
 
@@ -53,7 +61,7 @@ func LoadApiEndpoint() *mux.Router {
 					} else {
 						r.HandleFunc(route, delegate.HttpHandler).Methods(method)
 					}
-					initialPage.Append("Route: <i>" + route + "</i> Method: <i>" + method + "</i> <b> IS PROXY</b>")
+
 				}
 			}
 		}
@@ -105,16 +113,16 @@ func authMiddleware(authorizationSettings *api_settings.AuthorizationSettings, e
 
 func getProxyEndpoints() [10]string {
 	var endpoints [10]string
-	endpoints[0] = "{r1}"
-	endpoints[1] = "{r1}/{r2}"
-	endpoints[2] = "{r1}/{r2}/{r3}"
-	endpoints[3] = "{r1}/{r2}/{r3}/{r4}"
-	endpoints[4] = "{r1}/{r2}/{r3}/{r4}/{r5}"
-	endpoints[5] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}"
-	endpoints[6] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}"
-	endpoints[7] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}"
-	endpoints[8] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}/{r9}"
-	endpoints[9] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}/{r9}/{r10}"
+	endpoints[0] = "/{r1}"
+	endpoints[1] = "/{r1}/{r2}"
+	endpoints[2] = "/{r1}/{r2}/{r3}"
+	endpoints[3] = "/{r1}/{r2}/{r3}/{r4}"
+	endpoints[4] = "/{r1}/{r2}/{r3}/{r4}/{r5}"
+	endpoints[5] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}"
+	endpoints[6] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}"
+	endpoints[7] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}"
+	endpoints[8] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}/{r9}"
+	endpoints[9] = "/{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}/{r9}/{r10}"
 	return endpoints
 }
 

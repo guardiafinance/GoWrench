@@ -21,8 +21,8 @@ func (handler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *
 
 		request := new(client.HttpClientRequestData)
 		request.Body = bodyContext.BodyByteArray
-		request.Method = string(handler.ActionSettings.Http.Request.Method)
-		request.Url = handler.ActionSettings.Http.Request.Url
+		request.Method = handler.getMethod(wrenchContext)
+		request.Url = handler.getUrl(wrenchContext)
 		request.Insecure = handler.ActionSettings.Http.Request.Insecure
 		request.SetHeaders(handler.ActionSettings.Http.Request.MapFixedHeaders)
 		request.SetHeaders(mapHttpRequestHeaders(handler.ActionSettings.Http.Request.MapRequestHeaders))
@@ -58,8 +58,30 @@ func (handler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *
 	}
 }
 
-func (httpRequestClientHandler *HttpRequestClientHandler) SetNext(handler Handler) {
-	httpRequestClientHandler.Next = handler
+func (handler *HttpRequestClientHandler) SetNext(next Handler) {
+	handler.Next = next
+}
+
+func (handler *HttpRequestClientHandler) getMethod(wrenchContext *contexts.WrenchContext) string {
+
+	if !wrenchContext.Endpoint.IsProxy {
+		return string(handler.ActionSettings.Http.Request.Method)
+	} else {
+		return wrenchContext.Request.Method
+	}
+}
+
+func (handler *HttpRequestClientHandler) getUrl(wrenchContext *contexts.WrenchContext) string {
+
+	if !wrenchContext.Endpoint.IsProxy {
+		return handler.ActionSettings.Http.Request.Url
+	} else {
+		prefix := wrenchContext.Endpoint.Route
+		routeTriggered := wrenchContext.Request.RequestURI
+
+		routeWithoutPrefix := strings.ReplaceAll(routeTriggered, prefix, "")
+		return handler.ActionSettings.Http.Request.Url + routeWithoutPrefix
+	}
 }
 
 func mapHttpRequestHeaders(mapRequestHeader []string) map[string]string {
