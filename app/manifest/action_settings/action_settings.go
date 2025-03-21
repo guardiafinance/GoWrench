@@ -40,7 +40,8 @@ func (setting ActionSettings) Valid() validation.ValidateResult {
 	} else {
 		if (setting.Type == ActionTypeHttpRequest ||
 			setting.Type == ActionTypeHttpRequestMock ||
-			setting.Type == ActionTypeSnsPublish) == false {
+			setting.Type == ActionTypeSnsPublish ||
+		        setting.Type == ActionTypeFileReader) == false {
 
 			var msg = fmt.Sprintf("actions[%s].type should contain valid value", setting.Id)
 			result.AddError(msg)
