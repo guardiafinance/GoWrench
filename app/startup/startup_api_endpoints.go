@@ -28,20 +28,35 @@ func LoadApiEndpoint() *mux.Router {
 	initialPage.Append("<h2>Endpoints</h2>")
 
 	for _, endpoint := range endpoints {
-		method := strings.ToUpper(string(endpoint.Method))
-		route := endpoint.Route
-
+		shouldConfigureAuthorization := endpoint.ShouldConfigureAuthorization(hasAuthorization)
 		var delegate = new(handler.RequestDelegate)
 		delegate.SetEndpoint(&endpoint)
-		shouldConfigureAuthorization := endpoint.ShouldConfigureAuthorization(hasAuthorization)
 
-		if shouldConfigureAuthorization {
-			r.Handle(route, authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler))).Methods(method)
+		if endpoint.IsProxy {
+			method := strings.ToUpper(string(endpoint.Method))
+			route := endpoint.Route
+
+			if shouldConfigureAuthorization {
+				r.Handle(route, authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler))).Methods(method)
+			} else {
+				r.HandleFunc(route, delegate.HttpHandler).Methods(method)
+			}
+			initialPage.Append("Route: <i>" + route + "</i> Method: <i>" + method + "</i> <b>Not is proxy</b>")
 		} else {
-			r.HandleFunc(route, delegate.HttpHandler).Methods(method)
-		}
+			for _, proxyRoute := range getProxyEndpoints() {
+				route := proxyRoute
+				for _, proxyMethod := range getProxyEndpointMethods() {
+					method := proxyMethod
 
-		initialPage.Append("Route: <i>" + route + "</i> Method: <i>" + method + "</i>")
+					if shouldConfigureAuthorization {
+						r.Handle(route, authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler))).Methods(method)
+					} else {
+						r.HandleFunc(route, delegate.HttpHandler).Methods(method)
+					}
+					initialPage.Append("Route: <i>" + route + "</i> Method: <i>" + method + "</i> <b> IS PROXY</b>")
+				}
+			}
+		}
 	}
 
 	initialPage.Append("</br></br>")
@@ -71,7 +86,7 @@ func authMiddleware(authorizationSettings *api_settings.AuthorizationSettings, e
 			tokenIsValid := auth.JwksValidationAuthentication(tokenString, authorizationSettings)
 			if tokenIsValid {
 				tokenIsAuthorized := auth.JwksValidationAuthorization(tokenString, endpoint.Roles, endpoint.Scopes, endpoint.Claims)
-				if tokenIsAuthorized == false {
+				if !tokenIsAuthorized {
 					w.WriteHeader(http.StatusForbidden)
 					w.Write([]byte("Forbidden"))
 					return
@@ -86,4 +101,29 @@ func authMiddleware(authorizationSettings *api_settings.AuthorizationSettings, e
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func getProxyEndpoints() [10]string {
+	var endpoints [10]string
+	endpoints[0] = "{r1}"
+	endpoints[1] = "{r1}/{r2}"
+	endpoints[2] = "{r1}/{r2}/{r3}"
+	endpoints[3] = "{r1}/{r2}/{r3}/{r4}"
+	endpoints[4] = "{r1}/{r2}/{r3}/{r4}/{r5}"
+	endpoints[5] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}"
+	endpoints[6] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}"
+	endpoints[7] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}"
+	endpoints[8] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}/{r9}"
+	endpoints[9] = "{r1}/{r2}/{r3}/{r4}/{r5}/{r6}/{r7}/{r8}/{r9}/{r10}"
+	return endpoints
+}
+
+func getProxyEndpointMethods() [5]string {
+	var methods [5]string
+	methods[0] = "GET"
+	methods[1] = "POST"
+	methods[2] = "PUT"
+	methods[3] = "PATCH"
+	methods[4] = "DELETE"
+	return methods
 }
