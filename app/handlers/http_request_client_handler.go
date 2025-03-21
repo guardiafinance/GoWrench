@@ -17,7 +17,7 @@ type HttpRequestClientHandler struct {
 
 func (handler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) {
 
-	if wrenchContext.HasError == false {
+	if !wrenchContext.HasError {
 
 		request := new(client.HttpClientRequestData)
 		request.Body = bodyContext.BodyByteArray
@@ -25,7 +25,7 @@ func (handler *HttpRequestClientHandler) Do(ctx context.Context, wrenchContext *
 		request.Url = handler.ActionSettings.Http.Request.Url
 		request.Insecure = handler.ActionSettings.Http.Request.Insecure
 		request.SetHeaders(handler.ActionSettings.Http.Request.MapFixedHeaders)
-		request.SetHeaders(mapHttpRequestHeaders(wrenchContext, handler.ActionSettings.Http.Request.MapRequestHeaders))
+		request.SetHeaders(mapHttpRequestHeaders(handler.ActionSettings.Http.Request.MapRequestHeaders))
 
 		if len(handler.ActionSettings.Http.Request.TokenCredentialId) > 0 {
 			tokenData := token_credentials.GetTokenCredentialById(handler.ActionSettings.Http.Request.TokenCredentialId)
@@ -62,7 +62,7 @@ func (httpRequestClientHandler *HttpRequestClientHandler) SetNext(handler Handle
 	httpRequestClientHandler.Next = handler
 }
 
-func mapHttpRequestHeaders(wrenchContext *contexts.WrenchContext, mapRequestHeader []string) map[string]string {
+func mapHttpRequestHeaders(mapRequestHeader []string) map[string]string {
 	if mapRequestHeader == nil {
 		return nil
 	}
