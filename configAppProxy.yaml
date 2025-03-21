@@ -6,7 +6,7 @@ service:
 
 api:
   endpoints:
-    - route: /
+    - route: '/'
       isProxy: true
       actionId: action_proxy
 
@@ -16,5 +16,4 @@ actions:
     http:
       request:
         #insecure: true
-        method: post
         url: 'https://acquirer-jsons.snb.55tech.com.br/'
