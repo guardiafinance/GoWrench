@@ -8,6 +8,7 @@ import (
 type ApiSettings struct {
 	Endpoints     []EndpointSettings     `yaml:"endpoints"`
 	Authorization *AuthorizationSettings `yaml:"authorization"`
+	Cors          *CorsSettings          `yaml:"cors"`
 }
 
 func (setting ApiSettings) HasAuthorization() bool {
@@ -37,6 +38,10 @@ func (setting ApiSettings) Valid() validation.ValidateResult {
 
 	if setting.Authorization != nil {
 		result.AppendValidable(setting.Authorization)
+	}
+
+	if setting.Cors != nil {
+		result.AppendValidable(setting.Cors)
 	}
 
 	return result

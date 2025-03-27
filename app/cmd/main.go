@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -34,10 +33,10 @@ func main() {
 	application_settings.ApplicationSettingsStatic = applicationSetting
 
 	go token_credentials.LoadTokenCredentialAuthentication()
-	var router = startup.LoadApplicationSettings(applicationSetting)
+	hanlder := startup.LoadApplicationSettings(applicationSetting)
 	port := getPort()
-	log.Print(fmt.Sprintf("Server listen in port %s", port))
-	http.ListenAndServe(port, router)
+	log.Printf("Server listen in port %s", port)
+	http.ListenAndServe(port, hanlder)
 }
 
 func loadBashFiles() {
@@ -55,11 +54,11 @@ func bashRun(paths []string) {
 	for _, path := range paths {
 		path = strings.TrimSpace(path)
 		if _, err := os.Stat(path); err != nil {
-			log.Print(fmt.Sprintf("file bash %s not found", path))
+			log.Printf("file bash %s not found", path)
 			continue
 		}
 
-		log.Print(fmt.Sprintf("Will process file bash %s", path))
+		log.Printf("Will process file bash %s", path)
 		cmd := exec.Command("/bin/sh", "./"+path)
 
 		output, err := cmd.Output()
