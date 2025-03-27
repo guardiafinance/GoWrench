@@ -72,12 +72,12 @@ func LoadApiEndpoint() http.Handler {
 			app.Api.Cors.Origins = []string{"*"}
 		}
 
-		for i, item := range app.Api.Cors.Methods {
-			app.Api.Cors.Methods[i] = strings.ToUpper(item)
-		}
-
 		if len(app.Api.Cors.Methods) == 0 {
 			app.Api.Cors.Methods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+		} else {
+			for i, item := range app.Api.Cors.Methods {
+				app.Api.Cors.Methods[i] = strings.ToUpper(item)
+			}
 		}
 
 		if len(app.Api.Cors.Headers) == 0 {
