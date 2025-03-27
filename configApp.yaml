@@ -37,9 +37,9 @@ service:
 #         tokenType: "Bearer"
 
 api:
-  cors:
-    origins: 
-      - "*"
+  cors: {}
+    # origins: 
+    #   - "*"
     # methods:
     #   - "get"
     # headers:

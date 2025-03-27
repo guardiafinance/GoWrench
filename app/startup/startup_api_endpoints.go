@@ -68,13 +68,26 @@ func LoadApiEndpoint() http.Handler {
 	muxRoute.HandleFunc("/hc", initialPage.HealthCheckEndpoint).Methods("GET")
 
 	if app.Api.Cors != nil {
+		if len(app.Api.Cors.Origins) == 0 {
+			app.Api.Cors.Origins = []string{"*"}
+		}
+
 		for i, item := range app.Api.Cors.Methods {
 			app.Api.Cors.Methods[i] = strings.ToUpper(item)
 		}
+
+		if len(app.Api.Cors.Methods) == 0 {
+			app.Api.Cors.Methods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+		}
+
+		if len(app.Api.Cors.Headers) == 0 {
+			app.Api.Cors.Headers = []string{"Accept", "Accept-Language", "Content-Language", "Content-Type", "Authorization", "X-Requested-With", "X-Custom-Header"}
+		}
+
 		return handlers.CORS(
 			handlers.AllowedOrigins(app.Api.Cors.Origins),
-			// handlers.AllowedMethods(app.Api.Cors.Methods),
-			// handlers.AllowedHeaders(app.Api.Cors.Headers),
+			handlers.AllowedMethods(app.Api.Cors.Methods),
+			handlers.AllowedHeaders(app.Api.Cors.Headers),
 		)(muxRoute)
 	}
 
