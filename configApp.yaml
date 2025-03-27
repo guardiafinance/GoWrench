@@ -18,25 +18,32 @@ service:
 #       clientId: "{{KEYCLOCK_AUTH_CLIENT_ID}}"
 #       clientSecret: "{{KEYCLOCK_AUTH_CLIENT_SECRET}}"
 
-tokenCredentials:
-  - id: custom_client
-    type: custom_authentication
-    authEndpoint: "{{FISER_APPS_URL}}"
-    forceReload: 10m
-    custom:
-      method: post
-      requestHeaders:
-        Content-Type: application/json
-        Api-Key: "{{FISER_API_KEY}}"
-      requestBody:
-        application.secretTransferEncoding: "base64"
-        application.id: "{{FISER_APP_ID}}"
-        application.secret: "{{FISER_APP_SECRET}}"
-      configs:
-        accessTokenPropertyName: "tokens[0].value"
-        tokenType: "Bearer"
+# tokenCredentials:
+#   - id: custom_client
+#     type: custom_authentication
+#     authEndpoint: "{{FISER_APPS_URL}}"
+#     forceReload: 10m
+#     custom:
+#       method: post
+#       requestHeaders:
+#         Content-Type: application/json
+#         Api-Key: "{{FISER_API_KEY}}"
+#       requestBody:
+#         application.secretTransferEncoding: "base64"
+#         application.id: "{{FISER_APP_ID}}"
+#         application.secret: "{{FISER_APP_SECRET}}"
+#       configs:
+#         accessTokenPropertyName: "tokens[0].value"
+#         tokenType: "Bearer"
 
 api:
+  cors: {}
+    # origins: 
+    #   - "*"
+    # methods:
+    #   - "get"
+    # headers:
+    #   - "Authorization"
   # authorization:
   #   algorithm: RS256
   #   kid: "8GVJUug3bEnolN40OafuqQnhKDwt4BLKPvHQgw7nRLI"
@@ -45,8 +52,8 @@ api:
 
   endpoints:
     - route: /api/mock
-      method: post
-      enableAnonymous: true
+      method: get
+      # enableAnonymous: true
       actionId: post_customer_mock
 
     - route: /api/customer
@@ -94,14 +101,14 @@ actions:
     type: httpRequestMock
     http:
       mock:
-        # body: "{ 'Say':'Hello', 'observation': 'Will work' }"
-        mirrorBody: true
-        contentType: "application/json"
-        statusCode: 201
-        headers: 
-          "mock1": "value1"
-          "mock2": "value2"
-          "mock3": "value2"
+        body: "{ 'say':'Hello', 'observation': 'Will work' }"
+        #mirrorBody: true
+        # contentType: "application/json"
+        # statusCode: 200
+        # headers: 
+        #   "mock1": "value1"
+        #   "mock2": "value2"
+        #   "mock3": "value2"
   
   - id: cerc_register_participant
     type: httpRequest

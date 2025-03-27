@@ -10,10 +10,11 @@ import (
 	"wrench/app/manifest/api_settings"
 	"wrench/app/manifest/application_settings"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
-func LoadApiEndpoint() *mux.Router {
+func LoadApiEndpoint() http.Handler {
 	app := application_settings.ApplicationSettingsStatic
 
 	if app.Api == nil || app.Api.Endpoints == nil {
@@ -22,7 +23,7 @@ func LoadApiEndpoint() *mux.Router {
 
 	hasAuthorization := app.Api.HasAuthorization()
 	endpoints := app.Api.Endpoints
-	r := mux.NewRouter()
+	muxRoute := mux.NewRouter()
 	initialPage := new(InitialPage)
 	initialPage.Append("<h2>Service: " + app.Service.Name + "version: " + app.Service.Version + "</h2>")
 	initialPage.Append("<h2>Endpoints</h2>")
@@ -37,9 +38,9 @@ func LoadApiEndpoint() *mux.Router {
 			route := endpoint.Route
 
 			if shouldConfigureAuthorization {
-				r.Handle(route, authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler))).Methods(method)
+				muxRoute.Handle(route, authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler))).Methods(method)
 			} else {
-				r.HandleFunc(route, delegate.HttpHandler).Methods(method)
+				muxRoute.HandleFunc(route, delegate.HttpHandler).Methods(method)
 			}
 			initialPage.Append("Route: <i>" + route + "</i> Method: <i>" + method + "</i> <b>Not is proxy</b>")
 		} else {
@@ -49,9 +50,9 @@ func LoadApiEndpoint() *mux.Router {
 			}
 
 			if shouldConfigureAuthorization {
-				r.Handle(endpoint.Route+"/{path:.*}", authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler)))
+				muxRoute.Handle(endpoint.Route+"/{path:.*}", authMiddleware(app.Api.Authorization, endpoint, http.HandlerFunc(delegate.HttpHandler)))
 			} else {
-				r.HandleFunc(endpoint.Route+"/{path:.*}", delegate.HttpHandler)
+				muxRoute.HandleFunc(endpoint.Route+"/{path:.*}", delegate.HttpHandler)
 			}
 		}
 	}
@@ -63,9 +64,34 @@ func LoadApiEndpoint() *mux.Router {
 		envName := envSplitted[0]
 		initialPage.Append("Env: <i>" + envName + "</i>")
 	}
-	r.HandleFunc("/", initialPage.WriteInitialPage).Methods("GET")
-	r.HandleFunc("/hc", initialPage.HealthCheckEndpoint).Methods("GET")
-	return r
+	muxRoute.HandleFunc("/", initialPage.WriteInitialPage).Methods("GET")
+	muxRoute.HandleFunc("/hc", initialPage.HealthCheckEndpoint).Methods("GET")
+
+	if app.Api.Cors != nil {
+		if len(app.Api.Cors.Origins) == 0 {
+			app.Api.Cors.Origins = []string{"*"}
+		}
+
+		if len(app.Api.Cors.Methods) == 0 {
+			app.Api.Cors.Methods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+		} else {
+			for i, item := range app.Api.Cors.Methods {
+				app.Api.Cors.Methods[i] = strings.ToUpper(item)
+			}
+		}
+
+		if len(app.Api.Cors.Headers) == 0 {
+			app.Api.Cors.Headers = []string{"Accept", "Accept-Language", "Content-Language", "Content-Type", "Authorization", "X-Requested-With", "X-Custom-Header"}
+		}
+
+		return handlers.CORS(
+			handlers.AllowedOrigins(app.Api.Cors.Origins),
+			handlers.AllowedMethods(app.Api.Cors.Methods),
+			handlers.AllowedHeaders(app.Api.Cors.Headers),
+		)(muxRoute)
+	}
+
+	return muxRoute
 }
 
 func authMiddleware(authorizationSettings *api_settings.AuthorizationSettings, endpoint api_settings.EndpointSettings, next http.Handler) http.Handler {
