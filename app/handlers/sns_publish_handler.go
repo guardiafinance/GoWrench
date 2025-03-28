@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	contexts "wrench/app/contexts"
 	settings "wrench/app/manifest/action_settings"
@@ -45,12 +47,12 @@ func (handler *SnsPublishHandler) Do(ctx context.Context, wrenchContext *context
 		publishInput := sns.PublishInput{TopicArn: aws.String(settings.TopicArn), Message: aws.String(message)}
 
 		if settings.IsFifo() {
-			groupId := getConculatedValue(settings.Fifo.GroupId, wrenchContext, bodyContext)
+			groupId := getCalculatedValue(settings.Fifo.GroupId, wrenchContext, bodyContext)
 			if groupId != "" {
 				publishInput.MessageGroupId = aws.String(groupId)
 			}
 
-			dedupId := getConculatedValue(settings.Fifo.DeduplicationId, wrenchContext, bodyContext)
+			dedupId := getCalculatedValue(settings.Fifo.DeduplicationId, wrenchContext, bodyContext)
 			if dedupId != "" {
 				publishInput.MessageDeduplicationId = aws.String(dedupId)
 			}
@@ -83,18 +85,51 @@ func (handler *SnsPublishHandler) SetNext(next Handler) {
 	handler.Next = next
 }
 
-func getConculatedValue(getConculatedValue string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) string {
+func getCalculatedValue(getCalculatedValue string, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) string {
 	var value string
-	if len(getConculatedValue) > 0 {
-		if contexts.IsCalculatedValue(getConculatedValue) {
-			command := contexts.ReplaceCalculatedValue(getConculatedValue)
+	if len(getCalculatedValue) > 0 {
+		if contexts.IsCalculatedValue(getCalculatedValue) {
+			command := contexts.ReplaceCalculatedValue(getCalculatedValue)
 			if contexts.IsWrenchContextCommand(command) {
 				value = contexts.GetValueWrenchContext(command, wrenchContext)
 			} else {
-				value = contexts.GetValueBodyContext(command, bodyContext)
+				if contexts.IsBodyContextCommand(command) {
+					propertyName := contexts.ReplacePrefixBodyContext(command)
+					jsonMap := bodyContext.ParseBodyToMapObject()
+					if jsonMap != nil {
+						jsonMapCurrent := jsonMap
+						propertyNameSplitted := strings.Split(propertyName, ".")
+						
+						for i, property := range propertyNameSplitted {
+							if i == len(propertyNameSplitted)-1 {
+								if val, ok := jsonMapCurrent[property]; ok {
+									switch v := val.(type) {
+									case string:
+										value = v
+									case int:
+										value = strconv.Itoa(v)
+									default:
+										if jsonBytes, err := json.Marshal(v); err == nil {
+											value = string(jsonBytes)
+										}
+									}
+								}
+								break
+							} else {
+								if mapVal, ok := jsonMapCurrent[property].(map[string]interface{}); ok {
+									jsonMapCurrent = mapVal
+								} else {
+									break
+								}
+							}
+						}
+					}
+				} else {
+					value = contexts.GetValueBodyContext(command, bodyContext)
+				}
 			}
 		} else {
-			value = getConculatedValue
+			value = getCalculatedValue
 		}
 	}
 
@@ -102,16 +137,25 @@ func getConculatedValue(getConculatedValue string, wrenchContext *contexts.Wrenc
 }
 
 func getSnsFilter(snsSettings *sns_settings.SnsSettings, wrenchContext *contexts.WrenchContext, bodyContext *contexts.BodyContext) map[string]types.MessageAttributeValue {
-
 	mapAttributes := map[string]types.MessageAttributeValue{}
 	for _, filter := range snsSettings.Filters {
 		filterSplitted := strings.Split(filter, ":")
 		filterKey := filterSplitted[0]
 		filterValue := filterSplitted[1]
-		filterValue = getConculatedValue(filterValue, wrenchContext, bodyContext)
+		filterValue = getCalculatedValue(filterValue, wrenchContext, bodyContext)
 
 		if filterKey != "" && filterValue != "" {
-			mapAttributes[filterKey] = types.MessageAttributeValue{DataType: aws.String("String"), StringValue: aws.String(filterValue)}
+			if intValue, err := strconv.Atoi(filterValue); err == nil {
+				mapAttributes[filterKey] = types.MessageAttributeValue{
+					DataType:    aws.String("Number"),
+					StringValue: aws.String(strconv.Itoa(intValue)),
+				}
+			} else {
+				mapAttributes[filterKey] = types.MessageAttributeValue{
+					DataType:    aws.String("String"),
+					StringValue: aws.String(filterValue),
+				}
+			}
 		}
 	}
 
