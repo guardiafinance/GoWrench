@@ -1,0 +1,22 @@
+version: 1
+
+service:
+  name: "{{SERVICE_NAME}}"
+  version: 1.0.0
+
+connections:
+  nats:
+  - id: nats_default
+    serverAddress: "{{natsServerAddress}}"
+
+api:
+  endpoints:
+    - route: '/api/push_message'
+      actionId: action_produce_nats
+
+# actions:
+#   - id: action_produce_nats
+#     type: natsProducer
+#     connectionId: nats_default
+#     isStream: false
+#     subjectName: 'test.producer'
