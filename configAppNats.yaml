@@ -12,11 +12,12 @@ connections:
 api:
   endpoints:
     - route: '/api/push_message'
-      actionId: action_produce_nats
+      actionId: action_publish_nats
 
-# actions:
-#   - id: action_produce_nats
-#     type: natsProducer
-#     connectionId: nats_default
-#     isStream: false
-#     subjectName: 'test.producer'
+actions:
+  - id: action_publish_nats
+    type: natsPublish
+    nats:
+      connectionId: nats_default
+      isStream: false
+      subjectName: 'test.publish'
