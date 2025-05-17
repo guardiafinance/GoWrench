@@ -7,7 +7,7 @@ service:
 connections:
   nats:
   - id: nats_default
-    serverAddress: "{{natsServerAddress}}"
+    serverAddress: "{{NATS_SERVER_ADDRESS}}"
 
 api:
   endpoints:
