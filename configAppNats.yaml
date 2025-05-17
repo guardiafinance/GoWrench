@@ -12,6 +12,7 @@ connections:
 api:
   endpoints:
     - route: '/api/push_message'
+      method: post
       actionId: action_publish_nats
 
 actions:
@@ -19,5 +20,5 @@ actions:
     type: natsPublish
     nats:
       connectionId: nats_default
-      isStream: false
+      isStream: true
       subjectName: 'test.publish'

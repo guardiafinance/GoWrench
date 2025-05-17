@@ -65,6 +65,13 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 			currentHandler = fileReaderHandler
 		}
 
+		if action.Type == action_settings.ActionTypeNatsPublish {
+			httpNatsPublishHandler := new(NatsPublishHandler)
+			httpNatsPublishHandler.ActionSettings = &action
+			currentHandler.SetNext(httpNatsPublishHandler)
+			currentHandler = httpNatsPublishHandler
+		}
+
 		if action.Trigger != nil && action.Trigger.After != nil {
 			httpContractMapHandler := new(HttpContractMapHandler)
 
@@ -76,7 +83,6 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 		}
 
 		currentHandler.SetNext(new(HttpLastHandler))
-
 		chain.MapHandle[action.Id] = firstHandler
 	}
 }
