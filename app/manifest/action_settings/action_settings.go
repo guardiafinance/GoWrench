@@ -72,5 +72,9 @@ func (setting ActionSettings) Valid() validation.ValidateResult {
 		result.AppendValidable(setting.File)
 	}
 
+	if setting.Nats != nil {
+		result.AppendValidable(setting.Nats)
+	}
+
 	return result
 }
