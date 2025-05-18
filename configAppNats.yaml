@@ -21,4 +21,4 @@ actions:
     nats:
       connectionId: nats_default
       isStream: true
-      subjectName: 'test.publish'
+      subjectName: 'events.test.publish'

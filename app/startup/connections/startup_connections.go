@@ -11,5 +11,9 @@ func LoadConnections() error {
 
 	err := loadConnectionNats(app.Connections.Nats)
 
+	if err == nil {
+		err = loadJetStreams(app.Actions)
+	}
+
 	return err
 }

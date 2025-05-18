@@ -5,7 +5,7 @@ import (
 	"wrench/app/manifest/validation"
 )
 
-func actionValidation(action action_settings.ActionSettings) validation.ValidateResult {
+func actionValidation(action *action_settings.ActionSettings) validation.ValidateResult {
 	var result validation.ValidateResult
 
 	appSettings := ApplicationSettingsStatic

@@ -19,7 +19,7 @@ var ApplicationSettingsStatic *ApplicationSettings
 type ApplicationSettings struct {
 	Connections      *connection_settings.ConnectionSettings `yaml:"connections"`
 	Api              *api_settings.ApiSettings               `yaml:"api"`
-	Actions          []action_settings.ActionSettings        `yaml:"actions"`
+	Actions          []*action_settings.ActionSettings       `yaml:"actions"`
 	Service          *service_settings.ServiceSettings       `yaml:"service"`
 	TokenCredentials []*credential.TokenCredentialSetting    `yaml:"tokenCredentials"`
 	Contract         *contract_settings.ContractSetting      `yaml:"contract"`
@@ -29,7 +29,7 @@ type ApplicationSettings struct {
 func (settings ApplicationSettings) GetActionById(actionId string) (*action_settings.ActionSettings, error) {
 	for _, action := range settings.Actions {
 		if action.Id == actionId {
-			return &action, nil
+			return action, nil
 		}
 	}
 

@@ -5,4 +5,4 @@ services:
     ports:
       - "4222:4222"
       - "8222:8222"
-    #command: ["-js"]  # Enable JetStream
+    command: ["-js"]  # Enable JetStream

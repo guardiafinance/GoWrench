@@ -28,8 +28,9 @@ func (handler *NatsPublishHandler) Do(ctx context.Context, wrenchContext *contex
 
 		var err error
 		if settings.Nats.IsStream {
-			js, _ := natsConn.JetStream()
+			js := connections.GetJetStreamByConnectionId(settings.Nats.ConnectionId)
 			_, err = js.PublishMsg(msg)
+
 		} else {
 			err = natsConn.PublishMsg(msg)
 		}
