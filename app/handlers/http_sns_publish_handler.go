@@ -99,7 +99,6 @@ func getCalculatedValue(getCalculatedValue string, wrenchContext *contexts.Wrenc
 					if jsonMap != nil {
 						jsonMapCurrent := jsonMap
 						propertyNameSplitted := strings.Split(propertyName, ".")
-						
 						for i, property := range propertyNameSplitted {
 							if i == len(propertyNameSplitted)-1 {
 								if val, ok := jsonMapCurrent[property]; ok {
