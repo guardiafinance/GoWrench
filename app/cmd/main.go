@@ -9,6 +9,7 @@ import (
 	"wrench/app"
 	"wrench/app/manifest/application_settings"
 	"wrench/app/startup"
+	"wrench/app/startup/connections"
 	"wrench/app/startup/token_credentials"
 )
 
@@ -31,6 +32,11 @@ func main() {
 	}
 
 	application_settings.ApplicationSettingsStatic = applicationSetting
+
+	connErr := connections.LoadConnections()
+	if connErr != nil {
+		log.Printf("Error connections: %v", connErr)
+	}
 
 	go token_credentials.LoadTokenCredentialAuthentication()
 	hanlder := startup.LoadApplicationSettings(applicationSetting)

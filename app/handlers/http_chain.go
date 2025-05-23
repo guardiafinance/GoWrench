@@ -39,30 +39,37 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 
 		if action.Type == action_settings.ActionTypeHttpRequest {
 			httpRequestHadler := new(HttpRequestClientHandler)
-			httpRequestHadler.ActionSettings = &action
+			httpRequestHadler.ActionSettings = action
 			currentHandler.SetNext(httpRequestHadler)
 			currentHandler = httpRequestHadler
 		}
 
 		if action.Type == action_settings.ActionTypeHttpRequestMock {
 			httpRequestMockHadler := new(HttpRequestClientMockHandler)
-			httpRequestMockHadler.ActionSettings = &action
+			httpRequestMockHadler.ActionSettings = action
 			currentHandler.SetNext(httpRequestMockHadler)
 			currentHandler = httpRequestMockHadler
 		}
 
 		if action.Type == action_settings.ActionTypeSnsPublish {
 			snsPublishHandler := new(SnsPublishHandler)
-			snsPublishHandler.ActionSettings = &action
+			snsPublishHandler.ActionSettings = action
 			currentHandler.SetNext(snsPublishHandler)
 			currentHandler = snsPublishHandler
 		}
 
 		if action.Type == action_settings.ActionTypeFileReader {
 			fileReaderHandler := new(FileReaderHandler)
-			fileReaderHandler.ActionSettings = &action
+			fileReaderHandler.ActionSettings = action
 			currentHandler.SetNext(fileReaderHandler)
 			currentHandler = fileReaderHandler
+		}
+
+		if action.Type == action_settings.ActionTypeNatsPublish {
+			httpNatsPublishHandler := new(NatsPublishHandler)
+			httpNatsPublishHandler.ActionSettings = action
+			currentHandler.SetNext(httpNatsPublishHandler)
+			currentHandler = httpNatsPublishHandler
 		}
 
 		if action.Trigger != nil && action.Trigger.After != nil {
@@ -76,7 +83,6 @@ func (chain *Chain) BuildChain(settings *settings.ApplicationSettings) {
 		}
 
 		currentHandler.SetNext(new(HttpLastHandler))
-
 		chain.MapHandle[action.Id] = firstHandler
 	}
 }

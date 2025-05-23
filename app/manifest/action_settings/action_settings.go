@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"wrench/app/manifest/action_settings/file_settings"
 	"wrench/app/manifest/action_settings/http_settings"
+	"wrench/app/manifest/action_settings/nats_settings"
 	"wrench/app/manifest/action_settings/sns_settings"
 	"wrench/app/manifest/action_settings/trigger_settings"
 	"wrench/app/manifest/validation"
@@ -16,6 +17,7 @@ type ActionSettings struct {
 	SNS     *sns_settings.SnsSettings        `yaml:"sns"`
 	Trigger *trigger_settings.TriggerSetting `yaml:"trigger"`
 	File    *file_settings.FileSettings      `yaml:"file"`
+	Nats    *nats_settings.NatsSettings      `yaml:"nats"`
 }
 
 type ActionType string
@@ -25,6 +27,7 @@ const (
 	ActionTypeHttpRequestMock ActionType = "httpRequestMock"
 	ActionTypeSnsPublish      ActionType = "snsPublish"
 	ActionTypeFileReader      ActionType = "fileReader"
+	ActionTypeNatsPublish     ActionType = "natsPublish"
 )
 
 func (setting ActionSettings) Valid() validation.ValidateResult {
@@ -41,7 +44,8 @@ func (setting ActionSettings) Valid() validation.ValidateResult {
 		if (setting.Type == ActionTypeHttpRequest ||
 			setting.Type == ActionTypeHttpRequestMock ||
 			setting.Type == ActionTypeSnsPublish ||
-		        setting.Type == ActionTypeFileReader) == false {
+			setting.Type == ActionTypeFileReader ||
+			setting.Type == ActionTypeNatsPublish) == false {
 
 			var msg = fmt.Sprintf("actions[%s].type should contain valid value", setting.Id)
 			result.AddError(msg)
@@ -66,6 +70,10 @@ func (setting ActionSettings) Valid() validation.ValidateResult {
 
 	if setting.File != nil {
 		result.AppendValidable(setting.File)
+	}
+
+	if setting.Nats != nil {
+		result.AppendValidable(setting.Nats)
 	}
 
 	return result

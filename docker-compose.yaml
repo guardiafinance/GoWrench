@@ -11,3 +11,4 @@ services:
     - ./configApp.yaml:/configApp.yaml
     - ./startup.sh:/wrench/bash/startup.sh
     - ./.ENV:/.ENV
+    

@@ -1,0 +1,24 @@
+version: 1
+
+service:
+  name: "{{SERVICE_NAME}}"
+  version: 1.0.0
+
+connections:
+  nats:
+  - id: nats_default
+    serverAddress: "{{NATS_SERVER_ADDRESS}}"
+
+api:
+  endpoints:
+    - route: '/api/push_message'
+      method: post
+      actionId: action_publish_nats
+
+actions:
+  - id: action_publish_nats
+    type: natsPublish
+    nats:
+      connectionId: nats_default
+      isStream: true
+      subjectName: 'events.test.publish'
